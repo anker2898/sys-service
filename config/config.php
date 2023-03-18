@@ -1,11 +1,11 @@
 <?php
 
 //Ruta Local
-define("URL", "http://localhost/proyectos_web/SISTEMA_SERVICIOS/sys-service/");
+define("URL", "http://192.168.87.9/proyectos_web/SISTEMA_SERVICIOS/sys-service");
 
 //Nombre del sistema
 define("SYS", "System Service");
-define("SYS-SHORT", "SysSer");
+define("SYS-SHORT", "SysServ");
 define("DES", "Sistema de gestión de servicios.");
 
 //Ruta ambiente QAS

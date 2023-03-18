@@ -87,6 +87,7 @@ class User extends Controller
     public function deleteUser()
     {
         $this->view->url = "/user";
+        
         try {
             $document = $_GET['id'];
             $this->model->delete($document);
