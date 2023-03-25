@@ -1,12 +1,15 @@
 <?php
 
-class ParameterModel extends Model {
+class ParameterModel extends Model
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    public function get() {
+    public function get()
+    {
         $sql = "CALL SP_SEL_PARAMETER()";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->execute();
@@ -24,7 +27,8 @@ class ParameterModel extends Model {
         return $result;
     }
 
-    public function save($data) {
+    public function save($data)
+    {
         $sql = "CALL SP_INS_PARAMETER(:P_SLABEL, :P_SVALUE, :P_CTYPE)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_SLABEL', $data["LABEL"], PDO::PARAM_STR);
@@ -33,7 +37,8 @@ class ParameterModel extends Model {
         $stm->execute();
     }
 
-    public function getById($document) {
+    public function getById($document)
+    {
         $sql = "CALL SP_SEL_PARAMETER_ID(:P_NID)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_NID', $document, PDO::PARAM_INT);
@@ -43,11 +48,21 @@ class ParameterModel extends Model {
         return $result;
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $sql = "CALL SP_DEL_PARAMETER(:P_NID)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_NID', $id, PDO::PARAM_INT);
         $stm->execute();
     }
 
+    public function valid($label)
+    {
+        $sql = "CALL SP_VAL_PARAMETER(:P_SLABEL)";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_SLABEL', $label, PDO::PARAM_STR);
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        return $resultDb[0]["CANTIDAD"];
+    }
 }

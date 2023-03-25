@@ -70,7 +70,7 @@ class User extends Controller
             $this->view->messageHeader = "Operación exitósa";
             $this->view->message = "La operación se realizó con exito.";
         } catch (Exception $ex) {
-            echo($ex);
+            echo ($ex);
             $this->view->messageHeader = "Operación fallida";
             $this->view->message = "Ocurrió un error al ejecutar la operación.";
         } finally {
@@ -87,7 +87,7 @@ class User extends Controller
     public function deleteUser()
     {
         $this->view->url = "/user";
-        
+
         try {
             $document = $_GET['id'];
             $this->model->delete($document);
@@ -99,5 +99,15 @@ class User extends Controller
         } finally {
             $this->view->render('shared/message');
         }
+    }
+
+    public function validUser()
+    {
+        echo $this->model->valiUser($_POST["user"]);
+    }
+
+    public function validDocument()
+    {
+        echo $this->model->validDocument($_POST["document"]);
     }
 }

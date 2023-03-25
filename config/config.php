@@ -1,7 +1,7 @@
 <?php
 
 //Ruta Local
-define("URL", "http://192.168.87.9/proyectos_web/SISTEMA_SERVICIOS/sys-service");
+define("URL", "http://192.168.31.201/sys-service");
 
 //Nombre del sistema
 define("SYS", "System Service");
@@ -14,8 +14,8 @@ define("DES", "Sistema de gestión de servicios.");
 //Contantes de BD local
 define("HOST", "localhost");
 define("USER", "root");
-define("PASSWORD", "");
-define("BD", "adk");
+define("PASSWORD", "12345678");
+define("BD", "sys-service");
 
 //Contantes de BD QAS
 //define("HOST", "");

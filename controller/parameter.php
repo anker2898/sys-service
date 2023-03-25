@@ -26,13 +26,14 @@ class Parameter extends Controller
         $this->view->render('parameter/form');
     }
 
-    public function guardar() {
+    public function guardar()
+    {
         $data = array(
             "LABEL" => trim($_POST["label"]),
             "VALUE" => trim($_POST["value"]),
             "TYPE" => trim($_POST["type"]),
         );
-        
+
         $this->view->url = "/parameter";
 
         try {
@@ -40,7 +41,7 @@ class Parameter extends Controller
             $this->view->messageHeader = "Operación exitósa";
             $this->view->message = "La operación se realizó con exito.";
         } catch (Exception $ex) {
-            echo($ex);
+            echo ($ex);
             $this->view->messageHeader = "Operación fallida";
             $this->view->message = "Ocurrió un error al ejecutar la operación.";
         } finally {
@@ -77,4 +78,8 @@ class Parameter extends Controller
         }
     }
 
+    public function validParameter()
+    {
+        echo $this->model->valid($_POST["label"]);
+    }
 }
