@@ -148,7 +148,7 @@
     <!-- App Script -->
     <script>
         document.getElementById('password').addEventListener('keyup', function(e) {
-            let pass = document.getElementById('password').value;
+            let pass = e.target.value;
             let message = document.getElementById('message-error');
             if (pass.length < 8)
                 message.innerHTML = "<p>M&iacute;nimo debe poseer 8 caracteres</p>";
@@ -158,7 +158,7 @@
 
         document.getElementById('new-password').addEventListener('keyup', function(e) {
             let pass = document.getElementById('password').value;
-            let passNew = document.getElementById('new-password').value;
+            let passNew = e.target.value;
             let message = document.getElementById('message-error');
             document.getElementById('reset-pass').disabled = pass != passNew
             if (pass != passNew)

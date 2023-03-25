@@ -38,7 +38,8 @@ require 'views/shared/header.php';
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">Documento</label>
-                                        <input type="text" class="form-control" id="email1" name="documento" maxlength="8" required <?php echo $this->data != null ? "value='" . $this->data['DOCUMENTO'] . "'" : "" ?>>
+                                        <input type="text" class="form-control" id="document" name="documento" minlength="8" maxlength="8" required <?php echo $this->data != null ? "value='" . $this->data['DOCUMENTO'] . "' readonly" : "" ?>>
+                                        <p id="messageDocument" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -50,7 +51,7 @@ require 'views/shared/header.php';
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">N&uacute;mero telef&oacute;nico</label>
-                                        <input type="text" class="form-control" id="email1" name="numero" maxlength="9" required <?php echo $this->data != null ? "value='" . $this->data['NUMERO'] . "'" : "" ?>>
+                                        <input type="text" class="form-control" id="email1" name="numero" minlength="9" maxlength="9" required <?php echo $this->data != null ? "value='" . $this->data['NUMERO'] . "'" : "" ?>>
                                     </div>
                                 </div>
                                 <div class="col-8">
@@ -66,7 +67,8 @@ require 'views/shared/header.php';
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">Usuario</label>
-                                        <input type="text" class="form-control" id="email1" name="usuario" maxlength="20" required <?php echo $this->data != null ? "value='" . $this->data['USER'] . "'" : "" ?>>
+                                        <input type="text" class="form-control" id="user" name="usuario" maxlength="20" required <?php echo $this->data != null ? "value='" . $this->data['USER'] . "' readonly" : "" ?>>
+                                        <p id="messageUser" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -106,7 +108,7 @@ require 'views/shared/header.php';
                             </div>
                         </div>
                         <div class="container">
-                            <input type="submit" class="btn btn-primary" value="Guardar">
+                            <input type="submit" class="btn btn-primary" value="Guardar" id="save">
                             <a href="<?php echo constant("URL") ?>/user" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
@@ -115,4 +117,41 @@ require 'views/shared/header.php';
         </div>
     </div>
 </div>
+<script>
+    // Validacion USUARIO
+    $(document).ready(function() {
+        $("#user").change(function() {
+            var user = $(this).val();
+            $.ajax({
+                url: "<?php echo constant("URL") ?>/user/validUser",
+                type: "POST",
+                data: {
+                    user: user
+                },
+                success: function(respuesta) {
+                    $("#messageUser").html(respuesta > 0 ? "El usuario ya se encuentra registrado" : "Usuario valido").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
+                    $('#save').prop('disabled', respuesta > 0);
+                }
+            });
+        });
+    });
+
+    // Validacion DOCUMENTO
+    $(document).ready(function() {
+        $("#document").change(function() {
+            var document = $(this).val();
+            $.ajax({
+                url: "<?php echo constant("URL") ?>/user/validDocument",
+                type: "POST",
+                data: {
+                    document: document
+                },
+                success: function(respuesta) {
+                    $("#messageDocument").html(respuesta > 0 ? "El documento ya se encuentra registrado" : "Documento nuevo").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
+                    $('#save').prop('disabled', respuesta > 0);
+                }
+            });
+        });
+    });
+</script>
 <?php require 'views/shared/footer.php'; ?>

@@ -5,7 +5,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
-                        <h4 class="card-title">Listado de par&aacute;metros de negocio</h4>
+                        <h4 class="card-title">Listado de clientes</h4>
                     </div>
                 </div>
                 <div class="card-body">
@@ -13,11 +13,14 @@
                         <table id="datatable" class="table table-striped" data-toggle="data-table">
                             <thead>
                                 <tr>
-                                    <th>Par&aacute;metro</th>
-                                    <th>Valor</th>
-                                    <th>Tipo</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido Paterno</th>
+                                    <th>Apellido materno</th>
+                                    <th>Documento</th>
+                                    <th>Tel&eacute;fono</th>
+                                    <th>Correo</th>
                                     <th>
-                                        <a href="<?php echo constant("URL") ?>/parameter/new" class=" text-center btn btn-primary btn-icon mt-lg-0 mt-md-0 mt-3">
+                                        <a href="<?php echo constant("URL") ?>/client/new" class=" text-center btn btn-primary btn-icon mt-lg-0 mt-md-0 mt-3">
                                             <i class="btn-inner">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -32,11 +35,11 @@
                                 <?php foreach ($this->rows as $row) { ?>
                                     <tr>
                                         <?php for ($i = 0; $i < count($row)-1; $i++) {?>
-                                                <td><?php echo ($i != 2?$row[$i]:constant("TYPE-DATA")[$row[$i]]) ?>
+                                                <td><?php echo $row[$i] ?>
                                                 </td>
                                         <?php } ?>
                                         <td>
-                                            <a href="<?php echo constant("URL") ?>/parameter/edit?id=<?php echo ($row[3]) ?>" class="btn btn-sm btn-icon text-primary flex-end" data-bs-toggle="tooltip" title="Editar Par&aacute;metro">
+                                            <a href="<?php echo constant("URL") ?>/client/edit?id=<?php echo ($row[count($row)-1]) ?>" class="btn btn-sm btn-icon text-primary flex-end" data-bs-toggle="tooltip" title="Editar Cliente">
                                                 <span class="btn-inner">
                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M11.4925 2.78906H7.75349C4.67849 2.78906 2.75049 4.96606 2.75049 8.04806V16.3621C2.75049 19.4441 4.66949 21.6211 7.75349 21.6211H16.5775C19.6625 21.6211 21.5815 19.4441 21.5815 16.3621V12.3341" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -45,7 +48,7 @@
                                                     </svg>
                                                 </span>
                                             </a>
-                                            <a href="<?php echo constant("URL") ?>/parameter/delete?id=<?php echo ($row[3]) ?>" class="btn btn-sm btn-icon text-danger " data-bs-toggle="tooltip" title="Eliminar Par&aacute;metro">
+                                            <a href="<?php echo constant("URL") ?>/client/delete?id=<?php echo ($row[count($row)-1]) ?>" class="btn btn-sm btn-icon text-danger " data-bs-toggle="tooltip" title="Eliminar Cliente">
                                                 <span class="btn-inner">
                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
                                                         <path d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>

@@ -30,7 +30,8 @@
     <!-- RTL Css -->
     <link rel="stylesheet" href="<?php echo constant("URL") ?>/assets/css/rtl.min.css" />
 
-
+    <!-- AJAX -->
+    <script src="<?php echo constant("URL") ?>/assets/js/jquery.min.js"></script>
 </head>
 
 <body class="  ">
