@@ -25,4 +25,25 @@ class Shared extends Controller
             echo "<option value='" . $value[0] . "'>" . $value[1] . "</option>";
         }
     }
+
+    public function condominios()
+    {
+        $condominios = $this->model->getCondominio();
+        echo "<option value='' disabled selected>Seleccionar condominio</option>";
+        foreach ($condominios as $value) {
+            echo "<option value='" . $value[0] . "'>" . $value[1] . "</option>";
+        }
+    }
+
+    public function servicio()
+    {
+        $servicios = $this->model->getServicio();
+        foreach ($servicios as $value) {
+            echo '<div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" value="' . $value[0] . '">
+            <label class="form-check-label" for="flexCheckDefault11">' . $value[1] . "
+            </label>
+            </div>";
+        }
+    }
 }

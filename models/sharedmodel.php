@@ -40,7 +40,6 @@ class SharedModel extends Model
             );
             array_push($result, $data);
         }
-        print_r($result);
         return $result;
     }
 
@@ -56,6 +55,40 @@ class SharedModel extends Model
             $data = array(
                 $value["ID"],
                 $value["LABEL"],
+            );
+            array_push($result, $data);
+        }
+        return $result;
+    }
+
+    public function getCondominio()
+    {
+        $sql = "CALL SP_SEL_URBANIZACION()";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        $result = array();
+        foreach ($resultDb as $value) {
+            $data = array(
+                $value["ID"],
+                $value["CONDOMINIO"],
+            );
+            array_push($result, $data);
+        }
+        return $result;
+    }
+
+    public function getServicio()
+    {
+        $sql = "CALL SP_SEL_SERVICIOS()";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        $result = array();
+        foreach ($resultDb as $value) {
+            $data = array(
+                $value["ID"],
+                $value["SERVICIO"],
             );
             array_push($result, $data);
         }
