@@ -95,4 +95,23 @@ class UserModel extends Model {
         }
     }
 
+    public function valiUser($user)
+    {
+        $sql = "CALL SP_VAL_USER(:P_SUSER)";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_SUSER', $user, PDO::PARAM_STR);
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        return $resultDb[0]["CANTIDAD"];
+    }
+
+    public function validDocument($document)
+    {
+        $sql = "CALL SP_VAL_USER_DOCUMENT(:P_SDOCUMENT)";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_SDOCUMENT', $document, PDO::PARAM_STR);
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        return $resultDb[0]["CANTIDAD"];
+    }
 }

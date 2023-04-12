@@ -1,11 +1,11 @@
 <?php
 
 //Ruta Local
-define("URL", "http://192.168.31.201/adk");
+define("URL", "http://192.168.31.201/sys-service");
 
 //Nombre del sistema
 define("SYS", "System Service");
-define("SYS-SHORT", "SysSer");
+define("SYS-SHORT", "SysServ");
 define("DES", "Sistema de gestión de servicios.");
 
 //Ruta ambiente QAS
@@ -15,7 +15,7 @@ define("DES", "Sistema de gestión de servicios.");
 define("HOST", "localhost");
 define("USER", "root");
 define("PASSWORD", "12345678");
-define("BD", "adk");
+define("BD", "sys-service");
 
 //Contantes de BD QAS
 //define("HOST", "");

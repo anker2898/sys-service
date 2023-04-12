@@ -23,8 +23,7 @@ class App
         $path = 'controller/' . $url[0] . '.php';
 
         if (file_exists($path)) {
-
-            if (isset($_SESSION['user']) && $url[0] != "login" && $url[0] != "main") {
+            if (isset($_SESSION['user']) && $url[0] != "login" && $url[0] != "main" && $url[0] != "shared") {
                 $flagPermission = true;
                 foreach ($_SESSION['user']['PRIVILEGIOS'] as $pathPermission) {
                     $route = str_replace('/', '', $pathPermission['path']);
