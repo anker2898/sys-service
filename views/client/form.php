@@ -14,7 +14,7 @@ require 'views/shared/header.php';
                 </div>
                 <div class="card-body">
                     <form action="<?php echo constant("URL") ?>/client/guardar" method="POST">
-                        <div class="container">
+                        <div>
                             <h5 class="card-title">Ingresar datos</h5>
                             <div class="row">
                                 <div class="col-6">
@@ -95,7 +95,8 @@ require 'views/shared/header.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="container">
+                        <hr class="hr-horizontal">
+                        <div>
                             <input type="submit" class="btn btn-primary" value="Guardar" id="save">
                             <a href="<?php echo constant("URL") ?>/client" class="btn btn-danger">Cancel</a>
                         </div>
@@ -117,8 +118,8 @@ require 'views/shared/header.php';
                     departamento: departamento
                 },
                 success: function(respuesta) {
-                    console.log(respuesta);
                     $("#provincia").html(respuesta);
+                    $("#distrito").val($("#distrito option:first").val());
                 }
             });
         });
@@ -135,7 +136,6 @@ require 'views/shared/header.php';
                     provincia: provincia
                 },
                 success: function(respuesta) {
-                    console.log(respuesta);
                     $("#distrito").html(respuesta);
                 }
             });

@@ -14,7 +14,7 @@ require 'views/shared/header.php';
                 </div>
                 <div class="card-body">
                     <form action="<?php echo constant("URL") ?>/user/guardar" method="POST">
-                        <div class="container">
+                        <div>
                             <h5 class="card-title">Datos personales</h5>
                             <div class="row">
                                 <div class="col-6">
@@ -107,7 +107,8 @@ require 'views/shared/header.php';
                                 <?php } ?>
                             </div>
                         </div>
-                        <div class="container">
+                        <hr class="hr-horizontal">
+                        <div>
                             <input type="submit" class="btn btn-primary" value="Guardar" id="save">
                             <a href="<?php echo constant("URL") ?>/user" class="btn btn-danger">Cancel</a>
                         </div>
