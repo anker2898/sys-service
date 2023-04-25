@@ -52,25 +52,33 @@ class House extends Controller
             "CONDOMINIO" => $_POST["condominio"],
             "MANZANA" => trim($_POST["manzana"]),
             "LOTE" => trim($_POST["lote"]),
-            "SERVICIOS" => array()
+            "SERVICIOS" => array(
+                //Servicio de Luz : 1
+                //Servicio de agua : 2
+                "1" => array(
+                    "STATUS" => isset($_POST["luz"]) ? $_POST["luz"] : 0,
+                    "INICIO" => $_POST["inicio-luz"],
+                    "MEDIDA" => isset($_POST["medicion"]) ? $_POST["medicion"] : 0
+                ),
+                "2" => array(
+                    "STATUS" => isset($_POST["agua"]) ? $_POST["agua"] : 0,
+                    "INICIO" => $_POST["inicio-agua"],
+                    "MEDIDA" => 0
+                )
+            )
         );
-
-        $temp = array(
-            "ID" => $value[0],
-            "STATUS" => $_POST[$value[0]] ? 1 : 0
-        );
-        array_push($data["SERVICIOS"], $temp);
+        $this->view->url = "/house";
 
         try {
             $this->model->save($data);
             $this->view->messageHeader = "Operación exitósa";
             $this->view->message = "La operación se realizó con exito.";
         } catch (Exception $ex) {
-            echo ($ex);
+            echo $ex;
             $this->view->messageHeader = "Operación fallida";
             $this->view->message = "Ocurrió un error al ejecutar la operación.";
         } finally {
-            //$this->view->render('shared/message');
+            $this->view->render('shared/message');
         }
     }
 }

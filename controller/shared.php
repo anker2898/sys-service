@@ -46,4 +46,12 @@ class Shared extends Controller
             </div>";
         }
     }
+
+    public function image($img)
+    {
+        $directorio_destino = getcwd() . '/assets/data/';
+        $ruta_imagen = $directorio_destino . $img;
+        header('Content-Type: image/*');
+        readfile($ruta_imagen);
+    }
 }
