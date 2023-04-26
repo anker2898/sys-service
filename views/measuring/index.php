@@ -124,6 +124,20 @@
                     <div class="form-group">
                         <label class="form-label" for="medicion">Medici&oacute;n</label>
                         <input type="number" class="form-control" id="medicion" name="medicion" step="0.0001">
+                        <div id="medidor-agua">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <svg id="decrement" class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.75024C6.892 2.75024 2.75 6.89124 2.75 12.0002C2.75 17.1082 6.892 21.2502 12 21.2502C17.108 21.2502 21.25 17.1082 21.25 12.0002C21.25 6.89124 17.108 2.75024 12 2.75024Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M13.4424 8.52905L9.95638 12.0001L13.4424 15.4711" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <span class="fw-bold fs-4 mx-2" id="counter">0</span>
+                                <svg id="increment" class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21.2498C17.108 21.2498 21.25 17.1088 21.25 11.9998C21.25 6.89176 17.108 2.74976 12 2.74976C6.892 2.74976 2.75 6.89176 2.75 11.9998C2.75 17.1088 6.892 21.2498 12 21.2498Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M10.5576 15.4709L14.0436 11.9999L10.5576 8.52895" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-12" id="input-usuario">
@@ -132,7 +146,7 @@
                         <input type="text" class="form-control" id="usuario" name="usuario">
                     </div>
                 </div>
-                <div class="col-sm-12">
+                <div id="evidencia" class="col-sm-12">
                     <div class="form-group">
                         <label class="form-label" for="evidencia">Evidencia</label>
                         <input class="form-control" type="file" id="input-imagen" name="input-imagen">
@@ -156,6 +170,9 @@
 </div>
 
 <script>
+    let min = 0;
+    let count = 0;
+
     $(document).ready(function() {
         $("#buscar").click(function() {
             $.ajax({
@@ -173,40 +190,72 @@
     });
 
     $(document).on('click', '#btn-abrir-modal', function() {
+        // ABRIR EL MODAL
         $('#mi-modal').fadeIn();
+        $('#form').trigger('reset');
+        let servicio = $('#servicio').val();
 
+        // DATOA GENERALES
         $('#manzana').val($(this).data('manzana'));
         $('#lote').val($(this).data('lote'));
         $('#condominio-nombre').val($(this).data('condominio'));
-        $('#imagen').val($(this).data('imagen'));
 
-        if ($(this).data('medicion') == "") {
+        if (servicio == 1) {
+            $('#medicion').show();
+            $('#medidor-agua').hide();
+            $('#evidencia').show();
+            $('#imagen').val($(this).data('imagen'));
 
+            if ($(this).data('medicion') == "") {
+
+                $('#input-usuario').hide();
+                $('#medicion').prop('required', true);
+                $('#medicion').prop('readonly', false);
+                $('#input-imagen').prop('required', true);
+                $('#id').val($(this).data('id'));
+                $('#usuario').hide();
+                $('#guardar').show();
+                $('#input-imagen').show();
+
+            } else {
+
+                $('#guardar').hide();
+                $('#medicion').val($(this).data('medicion'));
+                $('#medicion').prop('readonly', true);
+                $('#usuario').show();
+                $('#input-usuario').show();
+                $('#usuario').val($(this).data('nombres'));
+                $('#usuario').prop('readonly', true);
+                $('#input-imagen').hide();
+                let path = '<?php echo constant("URL") ?>/shared/image/' + $(this).data('imagen');
+                $('#visualizador-imagen').html('<img src="' + path + '" class="img-fluid">');
+
+            }
+        } else {
+
+            $('#medidor-agua').show();
+            $('#medicion').hide();
+            $('#medicion').prop('required', false);
+            $('#input-imagen').prop('required', false);
+            $('#evidencia').hide();
             $('#input-usuario').hide();
-            $('#medicion').prop('required', true);
-            $('#medicion').prop('readonly', false);
-            $('#input-imagen').prop('required', true);
             $('#id').val($(this).data('id'));
-            $('#usuario').hide();
             $('#guardar').show();
             $('#input-imagen').show();
 
-        } else {
+            let counterEl = $('#counter');
+            counterEl.text($(this).data('medicion') || 0);
+            min = counterEl.text();
+            count = counterEl.text();
 
-            $('#guardar').hide();
-            $('#medicion').val($(this).data('medicion'));
-            $('#medicion').prop('readonly', true);
-            $('#usuario').show();
-            $('#input-usuario').show();
-            $('#usuario').val($(this).data('nombres'));
-            $('#usuario').prop('readonly', true);
-            $('#input-imagen').hide();
-            let path = '<?php echo constant("URL") ?>/shared/image/' + $(this).data('imagen');
-            $('#visualizador-imagen').html('<img src="' + path + '" class="img-fluid">');
+
 
         }
 
+        $(this).removeData();
     });
+
+
 
     $('body').on('click', '#cerrar-modal', function() {
         $('#mi-modal').fadeOut();
@@ -235,6 +284,8 @@
             let data = new FormData(this);
             data.append("condominio", $('#condominio').val());
             data.append("servicio", $('#servicio').val());
+            if ($('#servicio').val() == 2)
+                data.append("medicion", $('#counter').text());
 
             $.ajax({
                 url: "<?php echo constant("URL") ?>/measuring/guardar",
@@ -251,6 +302,17 @@
             });
         });
 
+        $('#decrement').on('click', function() {
+            if (count > min) {
+                count--;
+                $('#counter').text(count);
+            }
+        });
+
+        $('#increment').on('click', function() {
+            count++;
+            $('#counter').text(count);
+        });
     });
 </script>
 <?php require 'views/shared/footer.php'; ?>

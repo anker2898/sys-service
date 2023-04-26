@@ -41,7 +41,7 @@ class Measuring extends Controller
                     <th>' . $value["DOCUMENTO"] . '</th>
                     <th>' . $value["MANZANA"] . '</th>
                     <th>' . $value["LOTE"] . '</th>
-                    <th>' . ($value["MEDICION"] != null ?
+                    <th>' . ($value["MEDICION"] != null && $_POST["servicio"] == 1 ?
                 '<button type="button" id="btn-abrir-modal" class="btn btn-sm btn-icon text-primary flex-end" 
                 data-condominio="' . $value["CONDOMINIO"] . '" data-manzana="' . $value["MANZANA"] . '"  data-lote="' . $value["LOTE"] . '" 
                 data-medicion="' . $value["MEDICION"] . '"  data-imagen="'  . $value["IMAGEN"] . '"  data-nombres="' . $value["NOMBRES"] . '" 
@@ -91,19 +91,16 @@ class Measuring extends Controller
         );
 
         try {
-            $directorio_destino = getcwd() . '/assets/data/';
+            if (isset($_FILES['input-imagen']) && $_FILES['imagen']['error'] == 0 && $_POST["servicio"] == 1) {
+                $directorio_destino = getcwd() . '/assets/data/';
+                $nombre_temp = explode(".", $_FILES['input-imagen']['name']);
+                $archivo_nombre = $fecha_actual->format('Y-m-d') . "_" . $_POST["id"] . "." . array_pop($nombre_temp);
+                $archivo_temporal = $_FILES['input-imagen']['tmp_name'];
+                $data["imagen"] = $archivo_nombre;
 
-            if (!isset($_FILES['input-imagen'])) {
-                throw new Exception('Error al cargar la evidencia.');
-            }
-
-            $nombre_temp = explode(".", $_FILES['input-imagen']['name']);
-            $archivo_nombre = $fecha_actual->format('Y-m-d') . "_" . $_POST["id"] . "." . array_pop($nombre_temp);
-            $archivo_temporal = $_FILES['input-imagen']['tmp_name'];
-            $data["imagen"] = $archivo_nombre;
-
-            if (!move_uploaded_file($archivo_temporal, $directorio_destino . $archivo_nombre)) {
-                throw new Exception('Error al guardar la evidencia.');
+                if (!move_uploaded_file($archivo_temporal, $directorio_destino . $archivo_nombre)) {
+                    throw new Exception('Error al guardar la evidencia.');
+                }
             }
 
             $this->model->guardar($data);
