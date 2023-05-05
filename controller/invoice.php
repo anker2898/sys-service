@@ -15,4 +15,10 @@ class Invoice extends Controller
     {
         $this->view->render('invoice/index');
     }
+
+    public function getRecibo()
+    {
+        $result = $this->model->getRecibo($_POST["recibo"]);
+        echo json_encode($result);
+    }
 }

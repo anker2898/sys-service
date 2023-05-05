@@ -94,4 +94,36 @@ class SharedModel extends Model
         }
         return $result;
     }
+
+    public function getSuministro($suministro)
+    {
+        $sql = "CALL SP_VAL_SUMINISTRO(:P_NSUMINISTRO)";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_NSUMINISTRO', $suministro, PDO::PARAM_STR);
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        $result = array(
+            "valido" => count($resultDb) > 0
+        );
+        return $result;
+    }
+
+    public function getRecibo($suministro, $servicio)
+    {
+        $sql = "CALL SP_SEL_SERVICIO_RECIBO(:P_NSUMINISTRO, :P_NSERVICIO)";
+        $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_NSUMINISTRO', $suministro, PDO::PARAM_STR);
+        $stm->bindValue(':P_NSERVICIO', $servicio, PDO::PARAM_INT);
+        $stm->execute();
+        $resultDb = $stm->fetchAll();
+        $result = array();
+        foreach ($resultDb as $value) {
+            $data = array(
+                "id" => $value["ID"],
+                "emision" => $value["EMISION"],
+            );
+            array_push($result, $data);
+        }
+        return $result;
+    }
 }

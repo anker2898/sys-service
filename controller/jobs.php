@@ -7,33 +7,75 @@ class Jobs extends Controller
         parent::__construct();
     }
 
-    public function servicioLuz()
+    public function servicio()
     {
-        date_default_timezone_set('America/Lima');
+        date_default_timezone_set("America/Lima");
         $fecha_actual = new DateTime('now');
-        $nowDate = $fecha_actual->format('Y-m-d');
-        $lastDate = date('Y-m-t');
-        $startDate = date('Y-m-01');
-        $expirationDate = date('Y-m-07');
+        $nowDate = $fecha_actual->format('Y-m-d');  // FECHA ACTUAL
+        /* PARA PROD
+        $lastDate = date('Y-m-t');                  // ULTIMO DIA
+        $expirationDate = date('Y-m-07');           // FECHA DE VENCIMIENTO
+        */
 
-        if (strtotime($nowDate) != strtotime($lastDate)) { //Ejecucion ultimo dia
+        /* PARA QAS */
+        $nextDay = strtotime('+1 day', strtotime($nowDate));
+        $lastDate = date('Y-m-d', $nextDay);                  // ULTIMO DIA
+        $expirationDate = date('Y-m-d', $nextDay);           // FECHA DE VENCIMIENTO
 
-            //Cambio de estado de los comprobantes de pago
-            //De "En proceso" a "Pendiente de pago"
-            $this->model->cambioEstado(0);
 
-            //Generar los nuevos comprobantes de pago de liuz
-            echo "Generar comprobante de pagos";
-        } else if (strtotime($nowDate) == strtotime($expirationDate)) { //Ejecucion dia de vencimiento
-
-            //Cambio de estado de los comprobantes de pago
-            //De "Pendiente de pago" a "Vencido" o "Cancelado"
-            $this->model->cambioEstado(1);
+        // Flujo corre el ultimo dia a las 11:00
+        if (strtotime($nowDate) == strtotime($lastDate)) {              // Ejecucion ultimo dia
+            $this->generacionRecibos();
+        } else if (strtotime($nowDate) == strtotime($expirationDate)) { // Ejecucion dia de vencimiento
+            $this->deudasVencidas();
+        } else {                                                        // Ejecucion diario
+            $this->recibosClientesnuevos();
         }
     }
 
-    public function servicioAgua()
+    public function generacionRecibos()
     {
-        echo "agua";
+        //Cambio de estado de los comprobantes de pago
+        //De "En proceso" a "Pendiente de pago"
+        $this->model->cambioEstado(0);
+
+        //Generar los nuevos comprobantes de pago de luz
+        $nextMonth = strtotime('+1 month', strtotime((new DateTime('now'))->format('Y-m-d'))); // Sumar un mes a la fecha actual
+        $emision = date('Y-m-01', $nextMonth);
+        $fecha_actual = new DateTime('now');
+        $vencimiento = date('Y-m-07', $nextMonth);
+
+        $data = array(
+            "flow" => 1,
+            "emision" => $emision,
+            "vencimiento" => $vencimiento,
+            "ultimo" => $fecha_actual->format('Y-m-d')
+        );
+
+        // generar los recibos de los clientes nuevo
+        $this->model->generarrecibos($data);
+    }
+
+    private function deudasVencidas()
+    {
+        //Cambio de estado de los comprobantes de pago
+        //De "Pendiente de pago" a "Vencido" o "Cancelado"
+        $this->model->cambioEstado(1);
+    }
+
+    private function recibosClientesnuevos()
+    {
+        $nextMonth = strtotime('+1 month', strtotime((new DateTime('now'))->format('Y-m-d'))); // Sumar un mes a la fecha actual
+        $emision = date('Y-m-01', $nextMonth);
+        $vencimiento = date('Y-m-07', $nextMonth);
+
+        $data = array(
+            "flow" => 0,
+            "emision" => $emision,
+            "vencimiento" => $vencimiento
+        );
+
+        // generar los recibos de los clientes nuevo
+        $this->model->generarrecibos($data);
     }
 }

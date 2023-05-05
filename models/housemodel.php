@@ -41,7 +41,7 @@ class HouseModel extends Model
 
     public function save($data)
     {
-        $sql = "CALL SP_INS_CASAS(:P_SDOCUMENT, :P_SEMAIL, :P_SNUMERO, :P_NCONDOMINIO, :P_SMANZANA, :P_NLOTE)";
+        $sql = "CALL SP_INS_CASAS(:P_SDOCUMENT, :P_SEMAIL, :P_SNUMERO, :P_NCONDOMINIO, :P_SMANZANA, :P_NLOTE, :P_NSUMINISTRO)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_SDOCUMENT', $data["DOCUMENTO"], PDO::PARAM_STR);
         $stm->bindValue(':P_SEMAIL', $data["CORREO"], PDO::PARAM_STR);
@@ -49,6 +49,7 @@ class HouseModel extends Model
         $stm->bindValue(':P_NCONDOMINIO', $data["CONDOMINIO"], PDO::PARAM_INT);
         $stm->bindValue(':P_SMANZANA', $data["MANZANA"], PDO::PARAM_STR);
         $stm->bindValue(':P_NLOTE', $data["LOTE"], PDO::PARAM_INT);
+        $stm->bindValue(':P_NSUMINISTRO', $data["SUMINISTRO"], PDO::PARAM_INT);
         $stm->execute();
         $resultDb = $stm->fetchAll();
         $last_id = sizeof($resultDb) >= 1 ? $resultDb[0][0] : [];

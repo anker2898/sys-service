@@ -70,6 +70,13 @@ require 'views/shared/header.php';
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="suministro">Suministro</label>
+                                        <input type="number" class="form-control" id="suministro" name="suministro" maxlength="11" minlength="11" required <?php echo $this->data != null ? "value='" . $this->data['SUMINISTRO'] . "' readonly" : "disabled" ?>>
+                                        <p id="message-suministro" style="font-size: 0.8em;"></p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
@@ -159,6 +166,7 @@ require 'views/shared/header.php';
                         $("#save").prop("disabled", response.DOCUMENTO == null);
                         $('#luz').prop('disabled', response.DOCUMENTO == null);
                         $('#agua').prop('disabled', response.DOCUMENTO == null);
+                        $('#suministro').prop('disabled', response.DOCUMENTO == null);
                     }
                 });
             }
@@ -169,6 +177,22 @@ require 'views/shared/header.php';
         });
         $("#agua").change(function() {
             $('#inicio-agua').prop('disabled', !$(this).prop('checked'));
+        });
+        $("#suministro").keyup(function() {
+            if ($(this).val().length == 11) {
+                $.ajax({
+                    url: "<?php echo constant("URL") ?>/shared/getSuministro",
+                    type: "POST",
+                    data: {
+                        suministro: $(this).val(),
+                    },
+                    success: function(respuesta) {
+                        let response = JSON.parse(respuesta);
+                        $("#message").html(response["valido"] ? "El suministro se encuentra registrado." : "Suministro nuevo").css("color", response["valido"] ? "#c03221" : "#1aa053");
+                        $("#save").prop("disabled", response["valido"]);
+                    }
+                });
+            }
         });
     });
 </script>

@@ -54,4 +54,16 @@ class Shared extends Controller
         header('Content-Type: image/*');
         readfile($ruta_imagen);
     }
+
+    public function getSuministro()
+    {
+        $servicios = $this->model->getSuministro($_POST["suministro"]);
+        echo json_encode($servicios);
+    }
+
+    public function getRecibosAll()
+    {
+        $servicios = $this->model->getRecibo($_POST["suministro"], $_POST["servicio"]);
+        echo json_encode($servicios);
+    }
 }

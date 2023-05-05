@@ -52,6 +52,7 @@ class House extends Controller
             "CONDOMINIO" => $_POST["condominio"],
             "MANZANA" => trim($_POST["manzana"]),
             "LOTE" => trim($_POST["lote"]),
+            "SUMINISTRO" => $_POST["suministro"],
             "SERVICIOS" => array(
                 //Servicio de Luz : 1
                 //Servicio de agua : 2

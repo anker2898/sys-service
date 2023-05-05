@@ -244,11 +244,9 @@
             $('#input-imagen').show();
 
             let counterEl = $('#counter');
-            counterEl.text($(this).data('medicion') || 0);
+            counterEl.text(parseInt($(this).data('medicion') || 0));
             min = counterEl.text();
             count = counterEl.text();
-
-
 
         }
 
