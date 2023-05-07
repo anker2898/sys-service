@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-04-2023 a las 06:31:02
+-- Tiempo de generación: 05-05-2023 a las 05:19:56
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 8.0.25
 
@@ -74,17 +74,6 @@ CREATE PROCEDURE `SP_CAMBIO_ESTADO_RECIBO` (IN `P_FLOW` INT)   BEGIN
     END IF;
 END$$
 
-CREATE PROCEDURE `SP_CORE_RECIBOS` (IN `P_DEMISION` DATE, IN `P_DVENCIMIENTO` DATE)   BEGIN 
-
-	/* 
-    REGISTRAR LOS COMPROBANTES DE PAGO DE LOS CLIENTES RGISTRADOS HASTA EL ULTIMO DIA DEL MES 
-    */
-	INSERT INTO detalle_pago (NCLIENTE, NSERVICIO, DEMISION, DVENCIMIENTO)
-    SELECT CS.NCLIENTE, CS.NSERVICIO, P_DEMISION, DATE_ADD(P_DEMISION, INTERVAL 6 DAY)
-    FROM cliente_servicio CS;
-
-END$$
-
 CREATE PROCEDURE `SP_DEL_CLIENT` (IN `P_NID` INT)   BEGIN
 
 	UPDATE clientes
@@ -122,7 +111,7 @@ CREATE PROCEDURE `SP_DEL_USER` (IN `P_SDOCUMENT` VARCHAR(9))  DETERMINISTIC BEGI
 
 END$$
 
-CREATE PROCEDURE `SP_INS_CASAS` (IN `P_SDOCUMENT` VARCHAR(8), IN `P_SEMAIL` VARCHAR(100), IN `P_SNUMERO` VARCHAR(9), IN `P_NCONDOMINIO` INT, IN `P_SMANZANA` VARCHAR(2), IN `P_NLOTE` INT)   BEGIN
+CREATE PROCEDURE `SP_INS_CASAS` (IN `P_SDOCUMENT` VARCHAR(8), IN `P_SEMAIL` VARCHAR(100), IN `P_SNUMERO` VARCHAR(9), IN `P_NCONDOMINIO` INT, IN `P_SMANZANA` VARCHAR(2), IN `P_NLOTE` INT, IN `P_NSUMINISTRO` INT)   BEGIN
 
 	DECLARE V_NCLIENT INT;
     DECLARE V_NCASA   INT;
@@ -149,8 +138,8 @@ CREATE PROCEDURE `SP_INS_CASAS` (IN `P_SDOCUMENT` VARCHAR(8), IN `P_SEMAIL` VARC
     
     IF V_NCASA = 0 THEN 
     
-    	INSERT INTO casas (NCLIENTE, NURBANIZACION, SMANZANA, NLOTE)
-        VALUES (V_NCLIENT, P_NCONDOMINIO, UPPER(P_SMANZANA), P_NLOTE);
+    	INSERT INTO casas (NCLIENTE, NURBANIZACION, SMANZANA, NLOTE, NSUMINISTRO)
+        VALUES (V_NCLIENT, P_NCONDOMINIO, UPPER(P_SMANZANA), P_NLOTE, P_NSUMINISTRO);
         
     	SELECT LAST_INSERT_ID()
         INTO V_NIDCASA;
@@ -206,11 +195,12 @@ CREATE PROCEDURE `SP_INS_CLIENT` (IN `P_SDOCUMENT` VARCHAR(11), IN `P_SNOMBRE` V
     COMMIT;
 END$$
 
-CREATE PROCEDURE `SP_INS_MEDICION` (IN `P_NID` INT, IN `P_NMEDICION` DECIMAL(10.4), IN `P_SUSER` VARCHAR(100), IN `P_DREGISTRO` DATE, IN `P_SIMAGEN` VARCHAR(200))   BEGIN
+CREATE PROCEDURE `SP_INS_MEDICION` (IN `P_NID` INT, IN `P_NMEDICION` DECIMAL(20,4), IN `P_SUSER` VARCHAR(100), IN `P_DREGISTRO` DATE, IN `P_SIMAGEN` VARCHAR(200))   BEGIN
   DECLARE V_NIDUSER INT;
   DECLARE V_NIDSERVICIO INT;
-  DECLARE V_NDEUDA DECIMAL(4,2);
   DECLARE V_NVALOR DECIMAL(5,2);
+  DECLARE V_NMANTENIMIENTO DECIMAL(5,2);
+  DECLARE V_NALUMBRADO DECIMAL(5,2);
   
   #OBTENER ID DEL USUARIO
   SELECT U.NID INTO V_NIDUSER
@@ -223,51 +213,66 @@ CREATE PROCEDURE `SP_INS_MEDICION` (IN `P_NID` INT, IN `P_NMEDICION` DECIMAL(10.
   INNER JOIN casas_servicios CS ON CS.NID = P.NSERVICIO
   WHERE P.NID = P_NID;
   
-  BEGIN
-    #POSEE DEUDA
-    SELECT DP.NTOTAL INTO V_NDEUDA
-    FROM detalle_pago DP
-    WHERE DP.NSERVICIO IN (
-      SELECT P.NSERVICIO 
-      FROM detalle_pago P
-      WHERE P.NID = P_NID
-    )
-    ORDER BY DP.NID DESC LIMIT 1;
-
-    IF V_NDEUDA IS NULL THEN
-      SET V_NDEUDA = 0.00;
-    END IF;
-  END;
-
-
-  BEGIN
-    #OBTENER PRECIO
-    IF V_NIDSERVICIO = 1 THEN 
-      SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
+  #OBTENER PRECIO DE SERVICIOS
+  IF V_NIDSERVICIO = 1 THEN 
+  
+   SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
+     INTO V_NVALOR
+     FROM parametros_servicios PS
+    WHERE PS.SLABEL = 'PRECIO_LUZ'; 
+    
+   SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
+     INTO V_NALUMBRADO
+     FROM parametros_servicios PS
+    WHERE PS.SLABEL = 'ALUMBRADO_PUBLICO'; 
+    
+   SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
+     INTO V_NMANTENIMIENTO
+     FROM parametros_servicios PS
+    WHERE PS.SLABEL = 'MANTENIMIENTO_LUZ'; 
+    
+  ELSEIF V_NIDSERVICIO = 2 THEN 
+  
+    SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
       INTO V_NVALOR
       FROM parametros_servicios PS
-      WHERE PS.SLABEL = 'PRECIO_LUZ';      
-    ELSEIF V_NIDSERVICIO = 2 THEN 
-      SELECT CONVERT(PS.SVALUE, DECIMAL(4,2))
-      INTO V_NVALOR
-      FROM parametros_servicios PS
-      WHERE PS.SLABEL = 'PRECIO_AGUA';      
-    END IF;
+     WHERE PS.SLABEL = 'PRECIO_AGUA';   
+     
+  END IF;
 
-    IF V_NVALOR IS NULL THEN
-      SET V_NVALOR = 1.00;
-    END IF;
-  END;
-
-  UPDATE detalle_pago DP
-  SET DP.NUSER_MEDIDA = V_NIDUSER,
-      DP.MMEDICION = P_NMEDICION,
-      DP.DREGISTRO = P_DREGISTRO,
-      DP.NDEUDA = V_NDEUDA,
-      DP.NMONTO = V_NVALOR * P_NMEDICION,
-      DP.NTOTAL = V_NDEUDA + (V_NVALOR * P_NMEDICION),
-      DP.SIMAGEN = P_SIMAGEN
-  WHERE DP.NID = P_NID;
+  IF V_NVALOR IS NULL THEN
+    SET V_NVALOR = 1.00;
+  END IF;
+  
+  #OBTENER PRECIO
+  IF V_NIDSERVICIO = 1 THEN 
+      IF V_NMANTENIMIENTO IS NULL THEN
+        SET V_NMANTENIMIENTO = 0.00;
+      END IF;
+      
+      IF V_NALUMBRADO IS NULL THEN
+        SET V_NALUMBRADO = 0.00;
+      END IF;
+      
+      UPDATE detalle_pago DP
+         SET DP.NUSER_MEDIDA = V_NIDUSER,
+             DP.NMEDICION = P_NMEDICION,
+             DP.DREGISTRO = P_DREGISTRO,
+             DP.NMONTO = V_NVALOR * (P_NMEDICION - DP.NMEDICION_INI),
+             DP.NMANTENIMIENTO = V_NMANTENIMIENTO,
+             DP.NALUMBRADO = V_NALUMBRADO,
+             DP.NTOTAL = DP.NDEUDA +(V_NVALOR * (P_NMEDICION - DP.NMEDICION_INI)) + V_NMANTENIMIENTO + V_NALUMBRADO,
+             DP.SIMAGEN = P_SIMAGEN
+       WHERE DP.NID = P_NID;
+  ELSEIF V_NIDSERVICIO = 2 THEN 
+      UPDATE detalle_pago DP
+         SET DP.NUSER_MEDIDA = V_NIDUSER,
+             DP.NMEDICION = P_NMEDICION,
+             DP.DREGISTRO = P_DREGISTRO,
+             DP.NMONTO = V_NVALOR * P_NMEDICION,
+             DP.NTOTAL = DP.NDEUDA + (V_NVALOR * P_NMEDICION)
+       WHERE DP.NID = P_NID;    
+  END IF;
   
   COMMIT;
 END$$
@@ -290,6 +295,36 @@ CREATE PROCEDURE `SP_INS_PARAMETER` (IN `P_SLABEL` VARCHAR(100), IN `P_SVALUE` V
     END IF;
     
     COMMIT;
+END$$
+
+CREATE PROCEDURE `SP_INS_RECIBOS` (IN `P_NFLOW` INT, IN `P_DEMISION` DATE, IN `P_DVENCIMIENTO` DATE, IN `P_DVENC_ULTIMO` DATE)   BEGIN
+
+	IF P_NFLOW = 0 THEN
+    
+    	-- CLIENTES NUEVOS
+        INSERT INTO detalle_pago (NCLIENTE, NSERVICIO, NMEDICION_INI, DEMISION, DVENCIMIENTO)
+        SELECT c.NID, cs.NID, cs.NMEDIDA, P_DEMISION, P_DVENCIMIENTO
+          FROM clientes c 
+         INNER JOIN casas c2 			ON c2.NCLIENTE  = c.NID 
+         INNER JOIN casas_servicios cs  ON cs.NCASA 	= c2.NID  
+          LEFT JOIN detalle_pago dp 	ON dp.NSERVICIO = cs.NID 
+         WHERE cs.NSTATUS = 1 AND dp.NID is null;
+    
+    ELSEIF P_NFLOW = 1 THEN
+    
+    	-- CLIENTES YA EXISTENTES
+    	INSERT INTO detalle_pago (NCLIENTE, NSERVICIO, NMEDICION_INI, NDEUDA, DEMISION, DVENCIMIENTO)
+        SELECT c.NID, cs.NID, dp.NMEDICION, (dp.NTOTAL - IFNULL(dp.NPAGO, 0)), P_DEMISION, P_DVENCIMIENTO
+          FROM clientes c 
+         INNER JOIN casas c2 			ON c2.NCLIENTE  = c.NID 
+         INNER JOIN casas_servicios cs  ON cs.NCASA 	= c2.NID  
+          LEFT JOIN detalle_pago dp 	ON dp.NSERVICIO = cs.NID 
+         WHERE cs.NSTATUS = 1 
+           AND dp.DVENCIMIENTO = P_DVENC_ULTIMO
+           AND dp.NSTATUS = 1;
+        
+    END IF;
+
 END$$
 
 CREATE PROCEDURE `SP_INS_SERVICIOS` (IN `P_NIDCASA` INT, IN `P_NIDSERVICIO` INT, IN `P_DINICIO_SERVICIO` DATE, IN `P_NSTATUS` INT, IN `P_NMEDIDA` DECIMAL(20,4))   BEGIN
@@ -411,7 +446,8 @@ CREATE PROCEDURE `SP_SEL_CASA_ID` (IN `P_NID` INT)   BEGIN
            CONCAT(CL.SNOMBRE, ' ', CL.SAPELLIDO_PAT, ' ', CL.SAPELLIDO_MAT) AS "NOMBRES",
            CL.SEMAIL AS "CORREO",
            CL.SNUMBER AS "NUMERO",
-           U.NID	AS "CONDOMINIO"
+           U.NID	AS "CONDOMINIO",
+           C.NSUMINISTRO AS "SUMINISTRO"
     FROM casas C
     INNER JOIN clientes CL ON C.NCLIENTE = CL.NID
     INNER JOIN urbanizaciones U ON C.NURBANIZACION = U.NID
@@ -505,6 +541,36 @@ CREATE PROCEDURE `SP_SEL_PROVINCIA` (IN `P_NDEPARTAMENTO` VARCHAR(2))   BEGIN
 
 END$$
 
+CREATE PROCEDURE `SP_SEL_RECIBO` (IN `P_NRECIBO` INT)   BEGIN
+
+	SELECT CONCAT(C.SNOMBRE, ' ', C.SAPELLIDO_PAT, ' ', C.SAPELLIDO_MAT) AS "nombres",
+    	   D.SDEPARTAMENTO		AS "departamento",
+           P.SPROVINCIA			AS "provincia",
+           T.SDISTRITO			AS "distrito",
+           DP.NMEDICION_INI		AS "inicial",
+           DP.NMEDICION			AS "medicion",
+           DP.NMONTO			AS "monto",
+           DP.NMANTENIMIENTO	AS "mantenimiento",
+           DP.NALUMBRADO		AS "alumbrado",
+           DP.NTOTAL			AS "total",
+           DP.NDEUDA			AS "deuda",
+           CA.SMANZANA			AS "manzana",
+           CA.NLOTE				AS "lote",
+           U.SURBANIZACION		AS "condominio",
+           DP.NSTATUS			AS "estado",
+           DP.NPAGO				AS "pago"
+    FROM detalle_pago DP
+    INNER JOIN clientes C ON C.NID = DP.NCLIENTE
+    INNER JOIN casas_servicios CS ON CS.NID = DP.NSERVICIO
+    INNER JOIN casas CA ON CA.NID = CS.NCASA
+    INNER JOIN urbanizaciones U ON U.NID = CA.NURBANIZACION
+    INNER JOIN departamento D ON D.NID = C.NDEPARTAMENTO
+    INNER JOIN provincia P ON P.NID = C.NPROVINCIA
+    INNER JOIN distrito T ON T.NID = C.NDISTRITO
+    WHERE DP.NID = P_NRECIBO;
+
+END$$
+
 CREATE PROCEDURE `SP_SEL_ROLES` ()   BEGIN
 	SELECT P.NID    AS "ID",
 		   P.SLABEL AS "LABEL"
@@ -541,6 +607,19 @@ CREATE PROCEDURE `SP_SEL_SERVICIOS_CASA` (IN `P_NIDCASA` INT)   BEGIN
 
 END$$
 
+CREATE PROCEDURE `SP_SEL_SERVICIO_RECIBO` (IN `P_NSUMINISTRO` DECIMAL(11), IN `P_NSERVICIO` INT)   BEGIN
+
+	SELECT  DP.NID AS "ID",
+    		DP.DEMISION AS "EMISION"
+	FROM detalle_pago DP
+	INNER JOIN casas_servicios CS ON CS.NID = DP.NSERVICIO
+    INNER JOIN casas C 			  ON C.NID  = CS.NCASA
+    WHERE C.NSUMINISTRO = P_NSUMINISTRO
+    AND CS.NSERVICIO = P_NSERVICIO
+    AND DP.NSTATUS IN (1, 2, 3);
+
+END$$
+
 CREATE PROCEDURE `SP_SEL_URBANIZACION` ()   BEGIN
 
 	SELECT NID  AS "ID",
@@ -557,7 +636,7 @@ CREATE PROCEDURE `SP_SEL_URBANIZACION_SERVICIOS` (IN `P_NCONDOMINIO` INT, IN `P_
            C.NLOTE 						AS "LOTE",
            U.SURBANIZACION 				AS "CONDOMINIO",
            SR.SNOMBRE					AS "SERVICIO",
-           DP.MMEDICION 				AS "MEDICION",
+           DP.NMEDICION 				AS "MEDICION",
            DP.SIMAGEN					AS "IMAGEN",
            CONCAT(US.SNOMBRE, ' ', US.SAPELLIDO_PAT, ' ', US.SAPELLIDO_MAT)	AS "NOMBRES",
            DP.NID						AS "ID"
@@ -617,6 +696,15 @@ CREATE PROCEDURE `SP_VAL_PARAMETER` (IN `P_SLABEL` VARCHAR(99))   BEGIN
     
 END$$
 
+CREATE PROCEDURE `SP_VAL_SUMINISTRO` (IN `P_NSUMINISTRO` DECIMAL(11))   BEGIN
+	
+    SELECT CS.NSERVICIO AS "ID"
+    FROM casas C
+    INNER JOIN casas_servicios CS ON CS.NCASA = C.NID
+    WHERE C.NSUMINISTRO = P_NSUMINISTRO;
+
+END$$
+
 CREATE PROCEDURE `SP_VAL_USER` (IN `P_SUSER` VARCHAR(50))   BEGIN
 
     SELECT COUNT(*) AS "CANTIDAD"
@@ -646,20 +734,18 @@ CREATE TABLE `casas` (
   `NCLIENTE` int(11) NOT NULL,
   `NURBANIZACION` int(11) NOT NULL,
   `SMANZANA` varchar(4) NOT NULL,
-  `NLOTE` int(11) NOT NULL
+  `NLOTE` int(11) NOT NULL,
+  `NSUMINISTRO` decimal(11,0) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `casas`
 --
 
-INSERT INTO `casas` (`NID`, `NCLIENTE`, `NURBANIZACION`, `SMANZANA`, `NLOTE`) VALUES
-(1, 4, 1, 'D', 12),
-(7, 4, 1, 'M', 12),
-(8, 4, 1, 'W', 12),
-(9, 4, 1, 'S', 1),
-(10, 4, 1, 'M', 23),
-(11, 4, 1, 'Q', 1);
+INSERT INTO `casas` (`NID`, `NCLIENTE`, `NURBANIZACION`, `SMANZANA`, `NLOTE`, `NSUMINISTRO`) VALUES
+(12, 6, 1, 'M', 12, '20210000003'),
+(13, 7, 1, 'Q', 45, '20210000004'),
+(14, 6, 1, 'Q', 13, '20210000001');
 
 -- --------------------------------------------------------
 
@@ -681,16 +767,12 @@ CREATE TABLE `casas_servicios` (
 --
 
 INSERT INTO `casas_servicios` (`NID`, `NCASA`, `NSERVICIO`, `DINICIO_SERVICIO`, `NSTATUS`, `NMEDIDA`) VALUES
-(1, 11, 1, '2023-04-13', 1, '0.0000'),
-(2, 11, 2, '2023-04-12', 1, '0.1230'),
-(3, 1, 1, '2023-04-12', 1, '12321332.2112'),
-(4, 1, 2, '2023-04-13', 1, '0.0000'),
-(5, 7, 1, '2023-04-27', 1, '0.0000'),
-(6, 7, 2, NULL, 0, '0.0000'),
-(7, 9, 1, NULL, 0, '0.0000'),
-(8, 9, 2, '2023-04-13', 1, '0.0000'),
-(9, 10, 1, NULL, 0, '0.0000'),
-(10, 10, 2, '2023-04-28', 1, '0.0000');
+(11, 12, 1, '2023-04-29', 1, '435.8760'),
+(12, 12, 2, NULL, 0, '0.0000'),
+(13, 13, 1, '2023-05-01', 1, '345.1234'),
+(14, 13, 2, '2023-04-02', 1, '0.0000'),
+(15, 14, 1, NULL, 0, '0.0000'),
+(16, 14, 2, '2023-05-01', 1, '0.0000');
 
 -- --------------------------------------------------------
 
@@ -718,21 +800,8 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`NID`, `SDOCUMENT`, `SNOMBRE`, `SAPELLIDO_PAT`, `SAPELLIDO_MAT`, `SEMAIL`, `SNUMBER`, `SDIRECCION`, `NDEPARTAMENTO`, `NPROVINCIA`, `NDISTRITO`, `NSTATUS`) VALUES
-(1, 'QWWEQWE', 'Anker', 'Gutierrez', 'Huamanttupa', 'asd@asd.com', 'asdsadsad', 'Villa el salvador dasd', '15', '1501', '150142', 0),
-(3, 'P_SDOCUMENT', 'Anker', 'QQQQQQQQQQQQW', 'WWWWWWWWE', 'asd@asd.com', 'EWQ', 'QWEEQWEQW', '11', '1102', '110202', 0),
-(4, '12345678', 'Anker', 'Gutierrez', 'Huamanttupa', 'ASD@ASD.COM', '987654321', 'Villa el salvador', '10', '1002', '100203', 1),
-(5, '78946546', 'AAAAA', 'AAAA', 'AAAAA', 'ASD@ASD.COM', '89789897879', 'dfssdffsdfsdasdsad af', '16', '1602', '160205', 0);
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `cliente_servicio`
--- (Véase abajo para la vista actual)
---
-CREATE TABLE `cliente_servicio` (
-`NCLIENTE` int(11)
-,`NSERVICIO` int(11)
-);
+(6, '98765432', 'CLIENTE', 'PRUEBA', 'PRUEBA', 'ghma_2898@hotmail.com', '987654321', 'SECTOR 1 GRUPO 7', '15', '1501', '150142', 1),
+(7, '98765433', 'CLIENTE 2', 'PRUEBA', 'PRUEBA', 'ghma_2898@hotmail.com', '987654321', 'SECTOR 2 GRUPO 8', '15', '1501', '150111', 1);
 
 -- --------------------------------------------------------
 
@@ -786,39 +855,23 @@ CREATE TABLE `detalle_pago` (
   `NID` int(11) NOT NULL,
   `NCLIENTE` int(11) NOT NULL,
   `NSERVICIO` int(11) NOT NULL,
-  `NMONTO` decimal(4,2) DEFAULT NULL,
-  `NDEUDA` decimal(4,2) DEFAULT NULL,
-  `NTOTAL` decimal(4,2) DEFAULT NULL,
+  `NMONTO` decimal(8,2) DEFAULT NULL,
+  `NDEUDA` decimal(8,2) DEFAULT 0.00,
+  `NTOTAL` decimal(8,2) DEFAULT NULL,
   `NUSER` int(11) DEFAULT NULL,
   `NUSER_MEDIDA` int(11) DEFAULT NULL,
   `DREGISTRO` date DEFAULT NULL,
   `SOBSERVACION` varchar(99) DEFAULT NULL,
-  `MMEDICION` varchar(99) DEFAULT NULL,
+  `NMEDICION` decimal(20,4) DEFAULT NULL,
   `SIMAGEN` varchar(250) DEFAULT NULL,
   `NSTATUS` int(11) NOT NULL DEFAULT 0 COMMENT '0: En proceso, 1: Pendiente de pago, 2: Vencido, 3: Cancelado ',
   `DEMISION` date DEFAULT NULL,
-  `DVENCIMIENTO` date DEFAULT NULL
+  `DVENCIMIENTO` date DEFAULT NULL,
+  `NMEDICION_INI` decimal(20,4) DEFAULT 0.0000,
+  `NPAGO` decimal(8,2) DEFAULT 0.00,
+  `NMANTENIMIENTO` decimal(8,2) DEFAULT NULL,
+  `NALUMBRADO` decimal(8,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `detalle_pago`
---
-
-INSERT INTO `detalle_pago` (`NID`, `NCLIENTE`, `NSERVICIO`, `NMONTO`, `NDEUDA`, `NTOTAL`, `NUSER`, `NUSER_MEDIDA`, `DREGISTRO`, `SOBSERVACION`, `MMEDICION`, `SIMAGEN`, `NSTATUS`, `DEMISION`, `DVENCIMIENTO`) VALUES
-(1, 4, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(2, 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(3, 4, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(4, 4, 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(5, 4, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(6, 4, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(7, 4, 10, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 2, '2023-04-01', '2023-04-07'),
-(9, 4, 1, '99.99', '99.99', '99.99', 1, 1, '2023-04-24', NULL, '123', '2023-04-24_9.jfif', 0, '2023-05-01', '2023-05-07'),
-(10, 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, '2023-05-01', '2023-05-07'),
-(11, 4, 3, '99.99', '99.99', '99.99', 1, 1, '2023-04-24', NULL, '123', '2023-04-24_11.jfif', 0, '2023-05-01', '2023-05-07'),
-(12, 4, 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, '2023-05-01', '2023-05-07'),
-(13, 4, 5, '99.99', '99.99', '99.99', NULL, 1, '2023-04-24', NULL, '123213', '2023-04-24_13.avif', 0, '2023-05-01', '2023-05-07'),
-(14, 4, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, '2023-05-01', '2023-05-07'),
-(15, 4, 10, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, '2023-05-01', '2023-05-07');
 
 -- --------------------------------------------------------
 
@@ -2727,6 +2780,16 @@ CREATE TABLE `parametros_servicios` (
   `CTYPE` varchar(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `parametros_servicios`
+--
+
+INSERT INTO `parametros_servicios` (`NID`, `SLABEL`, `SVALUE`, `CTYPE`) VALUES
+(14, 'PRECIO_LUZ', '1.25', 'N'),
+(15, 'PRECIO_AGUA', '1.65', 'N'),
+(16, 'ALUMBRADO_PUBLICO', '5.00', 'N'),
+(17, 'MANTENIMIENTO_LUZ', '23.00', 'N');
+
 -- --------------------------------------------------------
 
 --
@@ -3030,7 +3093,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`NID`, `NSTATUS`, `SUSER`, `SPASSWORD`, `NPASSWORD_RESET`, `SDOCUMENT`, `SNOMBRE`, `SAPELLIDO_PAT`, `SAPELLIDO_MAT`, `SNUMBER`, `SDIRECCION`, `SEMAIL`) VALUES
-(1, 1, 'root', '25d55ad283aa400af464c76d713c07ad', 0, '12345678', 'Usuario', 'Prueba', 'Anker', '987654321', 'Villa el salvador', '');
+(1, 1, 'root', '25d55ad283aa400af464c76d713c07ad', 0, '12345678', 'Usuario', 'Prueba', 'Anker', '987654321', 'Villa el salvador', ''),
+(13, 1, 'anker28', '25d55ad283aa400af464c76d713c07ad', 0, '70000001', 'Anker', 'Gutierrez', 'Huamanttupa', '987654321', 'Villa el salvador', 'ghma_2898@hotmail.com');
 
 -- --------------------------------------------------------
 
@@ -3055,16 +3119,13 @@ INSERT INTO `usuario_privilegio` (`NID`, `NUSER`, `NPRIVILEGIO`, `NSTATUS`) VALU
 (15, 1, 3, 1),
 (31, 1, 4, 1),
 (32, 1, 5, 1),
-(33, 1, 6, 1);
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `cliente_servicio`
---
-DROP TABLE IF EXISTS `cliente_servicio`;
-
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `cliente_servicio`  AS SELECT `cl`.`NID` AS `NCLIENTE`, `cs`.`NID` AS `NSERVICIO` FROM ((`casas_servicios` `cs` join `casas` `ca` on(`ca`.`NID` = `cs`.`NCASA`)) join `clientes` `cl` on(`cl`.`NID` = `ca`.`NCLIENTE`)) WHERE `cl`.`NSTATUS` = 1 AND `cs`.`NSTATUS` = 1111  ;
+(33, 1, 6, 1),
+(34, 13, 1, 0),
+(35, 13, 2, 0),
+(36, 13, 3, 1),
+(37, 13, 4, 1),
+(38, 13, 5, 1),
+(39, 13, 6, 1);
 
 --
 -- Índices para tablas volcadas
@@ -3165,31 +3226,31 @@ ALTER TABLE `usuario_privilegio`
 -- AUTO_INCREMENT de la tabla `casas`
 --
 ALTER TABLE `casas`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `casas_servicios`
 --
 ALTER TABLE `casas_servicios`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_pago`
 --
 ALTER TABLE `detalle_pago`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT de la tabla `parametros_servicios`
 --
 ALTER TABLE `parametros_servicios`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `privilegios`
@@ -3213,13 +3274,13 @@ ALTER TABLE `urbanizaciones`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario_privilegio`
 --
 ALTER TABLE `usuario_privilegio`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Restricciones para tablas volcadas

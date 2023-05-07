@@ -47,11 +47,11 @@ class Shared extends Controller
         }
     }
 
-    public function image($img)
+    public function image($img, $ext = "*")
     {
         $directorio_destino = getcwd() . '/assets/data/';
         $ruta_imagen = $directorio_destino . $img;
-        header('Content-Type: image/*');
+        header('Content-Type: image/' . $ext);
         readfile($ruta_imagen);
     }
 

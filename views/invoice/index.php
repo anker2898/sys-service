@@ -201,7 +201,8 @@
                             <div class="form-group row">
                                 <label class="control-label col-sm-1 align-self-center mb-0" for="consumo">Pago:</label>
                                 <div class="col-sm-2">
-                                    <input type="number" class="form-control" id="pago" step="0.01">
+                                    <input type="number" class="form-control" id="pago" step="0.01" readonly>
+                                    <input type="hidden" name="id" id="id">
                                 </div>
                                 <div class="col-sm-3">
                                     <button type="button" class="btn btn-primary" id="pagar">
@@ -212,13 +213,13 @@
                                     </button>
                                 </div>
                                 <div id="estado" class="col-sm-3"></div>
-                                <div class="col-sm-3">
-                                    <button type="button" class="btn btn-primary" id="Descargar">
+                                <div class="col-sm-3" id="div-descargar">
+                                    <a href="<?php echo constant("URL") ?>/invoice/descargar" class="btn btn-primary" id="descargar">
                                         <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M7.81 2H16.191C19.28 2 21 3.78 21 6.83V17.16C21 20.26 19.28 22 16.191 22H7.81C4.77 22 3 20.26 3 17.16V6.83C3 3.78 4.77 2 7.81 2ZM8.08 6.66V6.65H11.069C11.5 6.65 11.85 7 11.85 7.429C11.85 7.87 11.5 8.22 11.069 8.22H8.08C7.649 8.22 7.3 7.87 7.3 7.44C7.3 7.01 7.649 6.66 8.08 6.66ZM8.08 12.74H15.92C16.35 12.74 16.7 12.39 16.7 11.96C16.7 11.53 16.35 11.179 15.92 11.179H8.08C7.649 11.179 7.3 11.53 7.3 11.96C7.3 12.39 7.649 12.74 8.08 12.74ZM8.08 17.31H15.92C16.319 17.27 16.62 16.929 16.62 16.53C16.62 16.12 16.319 15.78 15.92 15.74H8.08C7.78 15.71 7.49 15.85 7.33 16.11C7.17 16.36 7.17 16.69 7.33 16.95C7.49 17.2 7.78 17.35 8.08 17.31Z" fill="currentColor"></path>
                                         </svg>
                                         Descargar
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -233,6 +234,8 @@
 <script>
     $(document).ready(function() {
         $("#agua").hide();
+        $("#pagar").hide();
+        $("#div-descargar").hide();
         $("#buscar").click(function() {
 
             if ($("#servicio").val() == 1) {
@@ -258,7 +261,10 @@
                     $("#departamento").val(datos.departamento);
                     $("#provincia").val(datos.provincia);
                     $("#distrito").val(datos.distrito);
-                    console.log(datos);
+                    $('#div-descargar').show();
+                    $("#id").val(datos.id);
+                    $('#descargar').prop('href', `<?php echo constant("URL") ?>/invoice/descargar/${datos.id}`);
+
                     let html = "";
                     switch (datos.estado) {
                         case "1":
@@ -275,6 +281,7 @@
                             break;
                     }
                     $("#estado").html(html);
+
                     if (datos.alumbrado) {
                         $("#anterior").val(`${datos.inicial} kw`);
                         $("#actual").val(`${datos.medicion} kw`);
@@ -291,11 +298,13 @@
                         $("#deuda-agua").val(datos.deuda);
                         $("#total-agua").val(datos.total)
                     }
+
                     if (datos.pago > "0.00") {
                         $("#pago").val(datos.pago);
                         $("#pago").prop("readonly", true);
                         $("#pagar").hide();
                     } else {
+                        $("#pago").val("");
                         $("#pago").prop("readonly", false);
                         $("#pagar").show();
                     }
@@ -354,9 +363,34 @@
                 }
             });
         });
+
         $("#recibos").change(function() {
             $("#buscar").prop("disabled", !($(this).val() != 0));
         })
+
+        $("#pagar").click(function() {
+            let pago = $('#pago').val() == "" ? "0.00" : $('#pago').val();
+            $.ajax({
+                url: "<?php echo constant("URL") ?>/invoice/pagar",
+                type: "POST",
+                data: {
+                    recibo: $('#id').val(),
+                    pago: pago
+                },
+                success: function(respuesta) {
+                    let result = JSON.parse(respuesta);
+                    if (result.success) {
+                        $("#por-pagar").hide();
+                        $("#estado").html('<p class ="h3"><span class="badge bg-success">Cancelado</span></p>');
+                        $("#pago").prop("readonly", true);
+                        $("#pagar").hide();
+                    } else {
+                        console.error(result.message);
+                    }
+
+                }
+            });
+        });
     });
 </script>
 <?php require 'views/shared/footer.php'; ?>

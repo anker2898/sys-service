@@ -47,6 +47,8 @@ class App
             if (isset($url[1])) {
                 if (isset($url[2])) {
                     $controller->{$url[1]}($url[2]);
+                    if (isset($url[3]))
+                        $controller->{$url[1]}($url[3], $url[2]);
                 } else {
                     $controller->{$url[1]}();
                 }

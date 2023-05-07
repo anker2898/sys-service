@@ -36,9 +36,10 @@
     }
 
     #visualizador-imagen {
-        max-width: 100%;
+        max-width: 300px;
         max-height: 300px;
         margin-top: 10px;
+        margin: auto
     }
 </style>
 <div class="conatiner-fluid content-inner mt-n5 py-0">

@@ -11,16 +11,9 @@ class Jobs extends Controller
     {
         date_default_timezone_set("America/Lima");
         $fecha_actual = new DateTime('now');
-        $nowDate = $fecha_actual->format('Y-m-d');  // FECHA ACTUAL
-        /* PARA PROD
-        $lastDate = date('Y-m-t');                  // ULTIMO DIA
-        $expirationDate = date('Y-m-07');           // FECHA DE VENCIMIENTO
-        */
-
-        /* PARA QAS */
-        $nextDay = strtotime('+1 day', strtotime($nowDate));
-        $lastDate = date('Y-m-d', $nextDay);                  // ULTIMO DIA
-        $expirationDate = date('Y-m-d', $nextDay);           // FECHA DE VENCIMIENTO
+        $nowDate = $fecha_actual->format('Y-m-d H:i:s');  // FECHA ACTUAL
+        $lastDate = date('Y-m-t 11:50:00');                  // ULTIMO DIA
+        $expirationDate = date('Y-m-07 11:50:00');           // FECHA DE VENCIMIENTO
 
 
         // Flujo corre el ultimo dia a las 11:00
@@ -33,7 +26,7 @@ class Jobs extends Controller
         }
     }
 
-    public function generacionRecibos()
+    private function generacionRecibos()
     {
         //Cambio de estado de los comprobantes de pago
         //De "En proceso" a "Pendiente de pago"
