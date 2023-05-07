@@ -2797,10 +2797,10 @@ CREATE TABLE `parametros_servicios` (
 --
 
 INSERT INTO `parametros_servicios` (`NID`, `SLABEL`, `SVALUE`, `CTYPE`) VALUES
-(14, 'PRECIO_LUZ', '1.25', 'N'),
-(15, 'PRECIO_AGUA', '1.65', 'N'),
-(16, 'ALUMBRADO_PUBLICO', '5.00', 'N'),
-(17, 'MANTENIMIENTO_LUZ', '23.00', 'N');
+(1, 'PRECIO_LUZ', '1.25', 'N'),
+(2, 'PRECIO_AGUA', '1.65', 'N'),
+(3, 'ALUMBRADO_PUBLICO', '5.00', 'N'),
+(4, 'MANTENIMIENTO_LUZ', '23.00', 'N');
 
 -- --------------------------------------------------------
 
@@ -3126,12 +3126,12 @@ CREATE TABLE `usuario_privilegio` (
 --
 
 INSERT INTO `usuario_privilegio` (`NID`, `NUSER`, `NPRIVILEGIO`, `NSTATUS`) VALUES
-(5, 1, 1, 1),
-(6, 1, 2, 1),
-(15, 1, 3, 1),
-(31, 1, 4, 1),
-(32, 1, 5, 1),
-(33, 1, 6, 1);
+(1, 1, 1, 1),
+(2, 1, 2, 1),
+(3, 1, 3, 1),
+(4, 1, 4, 1),
+(5, 1, 5, 1),
+(6, 1, 6, 1);
 
 --
 -- Índices para tablas volcadas
@@ -3229,34 +3229,10 @@ ALTER TABLE `usuario_privilegio`
 --
 
 --
--- AUTO_INCREMENT de la tabla `casas`
---
-ALTER TABLE `casas`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT de la tabla `casas_servicios`
---
-ALTER TABLE `casas_servicios`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT de la tabla `clientes`
---
-ALTER TABLE `clientes`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT de la tabla `detalle_pago`
---
-ALTER TABLE `detalle_pago`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
-
---
 -- AUTO_INCREMENT de la tabla `parametros_servicios`
 --
 ALTER TABLE `parametros_servicios`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `privilegios`
@@ -3280,13 +3256,13 @@ ALTER TABLE `urbanizaciones`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario_privilegio`
 --
 ALTER TABLE `usuario_privilegio`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas
