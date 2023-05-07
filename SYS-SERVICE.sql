@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-05-2023 a las 05:19:56
+-- Tiempo de generación: 07-05-2023 a las 06:30:02
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 8.0.25
 
@@ -26,27 +26,30 @@ DELIMITER $$
 -- Procedimientos
 --
 CREATE PROCEDURE `SP_AUTH` (IN `P_SUSER` VARCHAR(80), IN `P_SPASSWORD` VARCHAR(255))   BEGIN
-	SELECT U.SUSER    AS "USUARIO",
-		   U.NSTATUS  AS "ESTADO",
-		   U.SNOMBRE AS "NOMBRE",
-		   U.SAPELLIDO_PAT AS "APELLIDO_PAT",
-		   U.SAPELLIDO_MAT AS "APELLIDO_MAT",
-		   U.NPASSWORD_RESET  AS "RESET"
-	FROM usuario U
-	WHERE U.SUSER = P_SUSER AND U.SPASSWORD = P_SPASSWORD
-	AND U.NSTATUS = 1;
+	
+  SELECT U.SUSER    AS "USUARIO",
+		     U.NSTATUS  AS "ESTADO",
+		     U.SNOMBRE AS "NOMBRE",
+		     U.SAPELLIDO_PAT AS "APELLIDO_PAT",
+		     U.SAPELLIDO_MAT AS "APELLIDO_MAT",
+		     U.NPASSWORD_RESET  AS "RESET"
+	  FROM usuario U
+	 WHERE U.SUSER = P_SUSER AND U.SPASSWORD = P_SPASSWORD
+	   AND U.NSTATUS = 1;
     
-    END$$
+END$$
 
 CREATE PROCEDURE `SP_AUTH_ROLES` (IN `P_SUSER` VARCHAR(80), IN `P_SPASSWORD` VARCHAR(80))   BEGIN
-	SELECT P.SLABEL   AS "LABEL",
-		   P.SURL	  AS "URL",
-           P.SICON	  AS "ICON"
-	FROM usuario U
-	INNER JOIN usuario_privilegio UP ON UP.NUSER = U.NID
-	INNER JOIN privilegios P ON UP.NPRIVILEGIO = P.NID
-	WHERE U.SUSER = P_SUSER AND U.SPASSWORD = P_SPASSWORD AND UP.NSTATUS = 1;
-	END$$
+	
+  SELECT P.SLABEL   AS "LABEL",
+		     P.SURL	  AS "URL",
+         P.SICON	  AS "ICON"
+	  FROM usuario U
+	 INNER JOIN usuario_privilegio UP ON UP.NUSER = U.NID
+	 INNER JOIN privilegios P ON UP.NPRIVILEGIO = P.NID
+	 WHERE U.SUSER = P_SUSER AND U.SPASSWORD = P_SPASSWORD AND UP.NSTATUS = 1;
+   
+END$$
 
 CREATE PROCEDURE `SP_CAMBIO_ESTADO_RECIBO` (IN `P_FLOW` INT)   BEGIN
 
@@ -61,17 +64,20 @@ CREATE PROCEDURE `SP_CAMBIO_ESTADO_RECIBO` (IN `P_FLOW` INT)   BEGIN
     */
     IF P_FLOW = 0 THEN
     
-        UPDATE detalle_pago D
-        SET D.NSTATUS = 1
-        WHERE D.NSTATUS = 0;
+      UPDATE detalle_pago D
+         SET D.NSTATUS = 1
+       WHERE D.NSTATUS = 0;
     
-	ELSEIF P_FLOW = 1 THEN
+	  ELSEIF P_FLOW = 1 THEN
     
     	UPDATE detalle_pago D
         SET D.NSTATUS = 2
         WHERE D.NSTATUS = 1;
         
     END IF;
+
+    COMMIT;
+
 END$$
 
 CREATE PROCEDURE `SP_DEL_CLIENT` (IN `P_NID` INT)   BEGIN
@@ -277,6 +283,25 @@ CREATE PROCEDURE `SP_INS_MEDICION` (IN `P_NID` INT, IN `P_NMEDICION` DECIMAL(20,
   COMMIT;
 END$$
 
+CREATE PROCEDURE `SP_INS_PAGO` (IN `P_NID` INT, IN `P_NPAGO` DECIMAL(8,2), IN `P_SUSUARIO` VARCHAR(50))   BEGIN
+
+	DECLARE V_NUSER INT;
+    
+	SELECT U.NID
+    INTO V_NUSER
+    FROM usuario U
+    WHERE U.SUSER = P_SUSUARIO;
+    
+    UPDATE detalle_pago DP
+    SET DP.NSTATUS = 3,
+    	DP.NUSER = V_NUSER,
+        DP.NPAGO = P_NPAGO
+    WHERE DP.NID = P_NID;
+    
+    COMMIT;
+
+END$$
+
 CREATE PROCEDURE `SP_INS_PARAMETER` (IN `P_SLABEL` VARCHAR(100), IN `P_SVALUE` VARCHAR(250), IN `P_CTYPE` VARCHAR(1))   BEGIN
 	DECLARE COUNT_PARAMETER INT;
     
@@ -320,10 +345,12 @@ CREATE PROCEDURE `SP_INS_RECIBOS` (IN `P_NFLOW` INT, IN `P_DEMISION` DATE, IN `P
          INNER JOIN casas_servicios cs  ON cs.NCASA 	= c2.NID  
           LEFT JOIN detalle_pago dp 	ON dp.NSERVICIO = cs.NID 
          WHERE cs.NSTATUS = 1 
-           AND dp.DVENCIMIENTO = P_DVENC_ULTIMO
+           -- AND dp.DVENCIMIENTO = P_DVENC_ULTIMO
            AND dp.NSTATUS = 1;
         
     END IF;
+
+    COMMIT;
 
 END$$
 
@@ -381,6 +408,8 @@ CREATE PROCEDURE `SP_INS_USER` (IN `P_SDOCUMENT` VARCHAR(8), IN `P_SNOMBRE` VARC
 		WHERE SDOCUMENT = TRIM(P_SDOCUMENT);
 	END IF;
 
+  COMMIT;
+
 END$$
 
 CREATE PROCEDURE `SP_INS_USER_PRIVILEGIOS` (IN `P_SDOCUMENT` VARCHAR(80), IN `P_SPRIVILEGIOS` VARCHAR(80), IN `P_BSTATUS` INT)   BEGIN
@@ -414,6 +443,8 @@ CREATE PROCEDURE `SP_INS_USER_PRIVILEGIOS` (IN `P_SDOCUMENT` VARCHAR(80), IN `P_
 		  AND UP.NUSER = NIDUSER;
 	END IF;
 
+    COMMIT;
+
 END$$
 
 CREATE PROCEDURE `SP_RESET_PASSWORD` (IN `P_SUSER` VARCHAR(80), IN `P_SPASSWORD` VARCHAR(80))   BEGIN
@@ -421,6 +452,7 @@ CREATE PROCEDURE `SP_RESET_PASSWORD` (IN `P_SUSER` VARCHAR(80), IN `P_SPASSWORD`
 	SET SPASSWORD = TRIM(P_SPASSWORD), 
 		NPASSWORD_RESET = 0 
 	WHERE SUSER = P_SUSER;
+      COMMIT;
 END$$
 
 CREATE PROCEDURE `SP_SEL_CASAS` ()   BEGIN
@@ -543,7 +575,16 @@ END$$
 
 CREATE PROCEDURE `SP_SEL_RECIBO` (IN `P_NRECIBO` INT)   BEGIN
 
-	SELECT CONCAT(C.SNOMBRE, ' ', C.SAPELLIDO_PAT, ' ', C.SAPELLIDO_MAT) AS "nombres",
+	SELECT DP.NID				AS "id",
+    	   CS.NSERVICIO			AS "servicio",
+           CA.NSUMINISTRO		AS "suministro",
+           U.SLOGO				AS "logo",
+    	   CONCAT(C.SNOMBRE, ' ', C.SAPELLIDO_PAT, ' ', C.SAPELLIDO_MAT) AS "nombres",
+    	   C.SDOCUMENT			AS "documento",
+           U.SURBANIZACION		AS "condominio",
+           U.SDIRECCION			AS "direccion",
+           CA.SMANZANA			AS "manzana",
+           CA.NLOTE				AS "lote",
     	   D.SDEPARTAMENTO		AS "departamento",
            P.SPROVINCIA			AS "provincia",
            T.SDISTRITO			AS "distrito",
@@ -554,10 +595,10 @@ CREATE PROCEDURE `SP_SEL_RECIBO` (IN `P_NRECIBO` INT)   BEGIN
            DP.NALUMBRADO		AS "alumbrado",
            DP.NTOTAL			AS "total",
            DP.NDEUDA			AS "deuda",
-           CA.SMANZANA			AS "manzana",
-           CA.NLOTE				AS "lote",
-           U.SURBANIZACION		AS "condominio",
            DP.NSTATUS			AS "estado",
+           DP.DEMISION			AS "emision",
+           DP.DVENCIMIENTO		AS "vencimiento",
+           DP.DREGISTRO			AS "registro",
            DP.NPAGO				AS "pago"
     FROM detalle_pago DP
     INNER JOIN clientes C ON C.NID = DP.NCLIENTE
@@ -738,15 +779,6 @@ CREATE TABLE `casas` (
   `NSUMINISTRO` decimal(11,0) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `casas`
---
-
-INSERT INTO `casas` (`NID`, `NCLIENTE`, `NURBANIZACION`, `SMANZANA`, `NLOTE`, `NSUMINISTRO`) VALUES
-(12, 6, 1, 'M', 12, '20210000003'),
-(13, 7, 1, 'Q', 45, '20210000004'),
-(14, 6, 1, 'Q', 13, '20210000001');
-
 -- --------------------------------------------------------
 
 --
@@ -761,18 +793,6 @@ CREATE TABLE `casas_servicios` (
   `NSTATUS` int(11) NOT NULL,
   `NMEDIDA` decimal(20,4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `casas_servicios`
---
-
-INSERT INTO `casas_servicios` (`NID`, `NCASA`, `NSERVICIO`, `DINICIO_SERVICIO`, `NSTATUS`, `NMEDIDA`) VALUES
-(11, 12, 1, '2023-04-29', 1, '435.8760'),
-(12, 12, 2, NULL, 0, '0.0000'),
-(13, 13, 1, '2023-05-01', 1, '345.1234'),
-(14, 13, 2, '2023-04-02', 1, '0.0000'),
-(15, 14, 1, NULL, 0, '0.0000'),
-(16, 14, 2, '2023-05-01', 1, '0.0000');
 
 -- --------------------------------------------------------
 
@@ -794,14 +814,6 @@ CREATE TABLE `clientes` (
   `NDISTRITO` varchar(6) NOT NULL,
   `NSTATUS` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `clientes`
---
-
-INSERT INTO `clientes` (`NID`, `SDOCUMENT`, `SNOMBRE`, `SAPELLIDO_PAT`, `SAPELLIDO_MAT`, `SEMAIL`, `SNUMBER`, `SDIRECCION`, `NDEPARTAMENTO`, `NPROVINCIA`, `NDISTRITO`, `NSTATUS`) VALUES
-(6, '98765432', 'CLIENTE', 'PRUEBA', 'PRUEBA', 'ghma_2898@hotmail.com', '987654321', 'SECTOR 1 GRUPO 7', '15', '1501', '150142', 1),
-(7, '98765433', 'CLIENTE 2', 'PRUEBA', 'PRUEBA', 'ghma_2898@hotmail.com', '987654321', 'SECTOR 2 GRUPO 8', '15', '1501', '150111', 1);
 
 -- --------------------------------------------------------
 
@@ -855,9 +867,9 @@ CREATE TABLE `detalle_pago` (
   `NID` int(11) NOT NULL,
   `NCLIENTE` int(11) NOT NULL,
   `NSERVICIO` int(11) NOT NULL,
-  `NMONTO` decimal(8,2) DEFAULT NULL,
+  `NMONTO` decimal(8,2) DEFAULT 0.00,
   `NDEUDA` decimal(8,2) DEFAULT 0.00,
-  `NTOTAL` decimal(8,2) DEFAULT NULL,
+  `NTOTAL` decimal(8,2) DEFAULT 0.00,
   `NUSER` int(11) DEFAULT NULL,
   `NUSER_MEDIDA` int(11) DEFAULT NULL,
   `DREGISTRO` date DEFAULT NULL,
@@ -3057,6 +3069,7 @@ INSERT INTO `servicios` (`NID`, `SNOMBRE`) VALUES
 CREATE TABLE `urbanizaciones` (
   `NID` int(11) NOT NULL,
   `SURBANIZACION` varchar(99) NOT NULL,
+  `SLOGO` longtext NOT NULL,
   `SDIRECCION` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -3064,8 +3077,8 @@ CREATE TABLE `urbanizaciones` (
 -- Volcado de datos para la tabla `urbanizaciones`
 --
 
-INSERT INTO `urbanizaciones` (`NID`, `SURBANIZACION`, `SDIRECCION`) VALUES
-(1, 'CONDOMINIO RESIDENCIAL PLAYA HUESO LOS REYES', 'Panamerica Sur KM 129.9 - Cerro Azul- Cañete');
+INSERT INTO `urbanizaciones` (`NID`, `SURBANIZACION`, `SLOGO`, `SDIRECCION`) VALUES
+(1, 'CONDOMINIO RESIDENCIAL PLAYA HUESO LOS REYES', 'logo.jpg', 'Panamerica Sur KM 129.9 - Cerro Azul- Cañete');
 
 -- --------------------------------------------------------
 
@@ -3093,8 +3106,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`NID`, `NSTATUS`, `SUSER`, `SPASSWORD`, `NPASSWORD_RESET`, `SDOCUMENT`, `SNOMBRE`, `SAPELLIDO_PAT`, `SAPELLIDO_MAT`, `SNUMBER`, `SDIRECCION`, `SEMAIL`) VALUES
-(1, 1, 'root', '25d55ad283aa400af464c76d713c07ad', 0, '12345678', 'Usuario', 'Prueba', 'Anker', '987654321', 'Villa el salvador', ''),
-(13, 1, 'anker28', '25d55ad283aa400af464c76d713c07ad', 0, '70000001', 'Anker', 'Gutierrez', 'Huamanttupa', '987654321', 'Villa el salvador', 'ghma_2898@hotmail.com');
+(1, 1, 'root', '25d55ad283aa400af464c76d713c07ad', 0, '12345678', 'Usuario', 'Prueba', 'Anker', '987654321', 'Villa el salvador', '');
 
 -- --------------------------------------------------------
 
@@ -3119,13 +3131,7 @@ INSERT INTO `usuario_privilegio` (`NID`, `NUSER`, `NPRIVILEGIO`, `NSTATUS`) VALU
 (15, 1, 3, 1),
 (31, 1, 4, 1),
 (32, 1, 5, 1),
-(33, 1, 6, 1),
-(34, 13, 1, 0),
-(35, 13, 2, 0),
-(36, 13, 3, 1),
-(37, 13, 4, 1),
-(38, 13, 5, 1),
-(39, 13, 6, 1);
+(33, 1, 6, 1);
 
 --
 -- Índices para tablas volcadas
@@ -3244,7 +3250,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `detalle_pago`
 --
 ALTER TABLE `detalle_pago`
-  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `NID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT de la tabla `parametros_servicios`
