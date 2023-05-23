@@ -14,7 +14,7 @@
                     <div class="container text-center">
                         <div class="row">
                             <div class="col-12">
-                                <img width="80%" src="https://cdn.goconqr.com/uploads/media/image/37268456/desktop_584440b8-02d9-468b-a634-087d4abd5f99.png" alt="Bienvenido a <?php echo constant("SYS-SHORT") ?>">
+                                <img width="80%" src="<?php echo constant("URL") ?>/assets/images/wallpaper/manager.png" alt="Bienvenido a <?php echo constant("SYS-SHORT") ?>">
                             </div>
                         </div>
                     </div>

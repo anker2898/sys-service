@@ -19,7 +19,7 @@
                                     <th>Ap. Paterno</th>
                                     <th>Ap. Materno</th>
                                     <th>Documento</th>
-                                    <th>
+                                    <th class="text-center">
                                         <a href="<?php echo constant("URL") ?>/user/new" class=" text-center btn btn-primary btn-icon mt-lg-0 mt-md-0 mt-3">
                                             <i class="btn-inner">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +50,7 @@
                                             <?php } ?>
 
                                         <?php } ?>
-                                        <td>
+                                        <td class="text-center">
                                             <a href="<?php echo constant("URL") ?>/user/edit?id=<?php echo ($row[5]) ?>" class="btn btn-sm btn-icon text-primary flex-end" data-bs-toggle="tooltip" title="Editar Usuario">
                                                 <span class="btn-inner">
                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

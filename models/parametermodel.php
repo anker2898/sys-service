@@ -29,11 +29,12 @@ class ParameterModel extends Model
 
     public function save($data)
     {
-        $sql = "CALL SP_INS_PARAMETER(:P_SLABEL, :P_SVALUE, :P_CTYPE)";
+        $sql = "CALL SP_INS_PARAMETER(:P_SLABEL, :P_SVALUE, :P_CTYPE, :P_NIDUSER)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_SLABEL', $data["LABEL"], PDO::PARAM_STR);
         $stm->bindValue(':P_SVALUE', $data["VALUE"], PDO::PARAM_STR);
         $stm->bindValue(':P_CTYPE', $data["TYPE"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NIDUSER', $data["USER"], PDO::PARAM_STR);
         $stm->execute();
     }
 
