@@ -7,6 +7,7 @@ class Invoice extends Controller
         parent::__construct();
 
         $this->shared = new SharedModel();
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Recibos";
         $this->view->title = "Visualizador de recibos";
         $this->view->subtitle = "Se visualiza recibo de acuerdo a hogar, servicio y titular.";
     }

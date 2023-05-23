@@ -8,6 +8,7 @@ class User extends Controller
         parent::__construct();
         $this->view->rows = [];
         $this->view->data = null;
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Usuario";
         $this->view->dataRoles = [];
         $this->view->roles = [];
         $this->view->message = "";

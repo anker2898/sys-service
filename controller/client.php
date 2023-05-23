@@ -13,6 +13,7 @@ class Client extends Controller
         $this->view->message = "";
         $this->view->messageHeader = "";
         $this->view->url = "";
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Clientes";
         $this->view->title = "Gestión de Clientes";
         $this->view->subtitle = "El siguiente mantenimiento se puede gestionar a los clientes a quienes se le brindaran los servicios.";
 

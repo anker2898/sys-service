@@ -15,10 +15,10 @@
                                 <tr>
                                     <th style="width: 10%;">DNI</th>
                                     <th style="width: 30%;">Nombre del cliente</th>
-                                    <th style="width: 30%;">Condominio</th>
+                                    <th style="width: 30%;">Suministro</th>
                                     <th style="width: 10%;">Manzana</th>
                                     <th style="width: 10%;">Lote</th>
-                                    <th style="width: 10%;">
+                                    <th style="width: 10%;" class="text-center">
                                         <a href="<?php echo constant("URL") ?>/house/new" class=" text-center btn btn-primary btn-icon mt-lg-0 mt-md-0 mt-3">
                                             <i class="btn-inner">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,7 +37,7 @@
                                             <td><?php echo $row[$i] ?>
                                             </td>
                                         <?php } ?>
-                                        <td>
+                                        <td class="text-center">
                                             <a href="<?php echo constant("URL") ?>/house/edit?id=<?php echo ($row[count($row) - 1]) ?>" class="btn btn-sm btn-icon text-primary flex-end" data-bs-toggle="tooltip" title="Editar Cliente">
                                                 <span class="btn-inner">
                                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

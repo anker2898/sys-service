@@ -60,14 +60,12 @@ require 'views/shared/header.php';
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Manzana</label>
                                         <input type="text" class="form-control" id="manzana" name="manzana" maxlength="2" required <?php echo $this->data != null ? "value='" . $this->data['MANZANA'] . "' readonly" : "disabled" ?>>
-                                        <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Lote</label>
                                         <input type="number" class="form-control" id="lote" name="lote" required <?php echo $this->data != null ? "value='" . $this->data['LOTE'] . "' readonly" : "disabled" ?>>
-                                        <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -188,7 +186,7 @@ require 'views/shared/header.php';
                     },
                     success: function(respuesta) {
                         let response = JSON.parse(respuesta);
-                        $("#message").html(response["valido"] ? "El suministro se encuentra registrado." : "Suministro nuevo").css("color", response["valido"] ? "#c03221" : "#1aa053");
+                        $("#message-suministro").html(response["valido"] ? "El suministro se encuentra registrado." : "Suministro nuevo").css("color", response["valido"] ? "#c03221" : "#1aa053");
                         $("#save").prop("disabled", response["valido"]);
                     }
                 });

@@ -18,7 +18,7 @@ class HouseModel extends Model
             $data = array(
                 $value["DOCUMENTO"],
                 $value["NOMBRE"] . " " . $value["APPATERNO"],
-                $value["CONDOMINIO"],
+                $value["SUMINISTRO"],
                 $value["MANZANA"],
                 $value["LOTE"],
                 $value["ID"]

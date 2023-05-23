@@ -1,7 +1,7 @@
 <?php
 
 //Ruta Local
-define("URL", "http://192.168.31.87/sys-service");
+define("URL", "http://192.168.31.241/sys-service");
 
 //Nombre del sistema
 define("SYS", "System Service");

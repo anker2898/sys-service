@@ -19,7 +19,7 @@ class App
             $controller->render();
             return false;
         }
-        $url[0] = $_SESSION['login'] ? $url[0] : 'login';
+        $url[0] = $_SESSION['login'] || $url[0] == "jobs" ? $url[0] : 'login';
         $path = 'controller/' . $url[0] . '.php';
 
         if (file_exists($path)) {

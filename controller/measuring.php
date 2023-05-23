@@ -7,6 +7,7 @@ class Measuring extends Controller
         parent::__construct();
 
         $this->shared = new SharedModel();
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Medición";
         $this->view->title = "Registro de medición";
         $this->view->subtitle = "Este gestor facilitará el registro de las mediciones realizadas.";
         $this->view->condominio = [];

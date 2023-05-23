@@ -8,6 +8,7 @@ class Parameter extends Controller
         parent::__construct();
         $this->view->rows = [];
         $this->view->data = null;
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Parámetros";
         $this->view->message = "";
         $this->view->messageHeader = "";
         $this->view->url = "";
@@ -32,6 +33,7 @@ class Parameter extends Controller
             "LABEL" => trim($_POST["label"]),
             "VALUE" => trim($_POST["value"]),
             "TYPE" => trim($_POST["type"]),
+            "USER" => $_SESSION["user"]["NIDUSER"]
         );
 
         $this->view->url = "/parameter";

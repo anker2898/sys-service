@@ -9,6 +9,7 @@ class House extends Controller
         $this->view->condominio = [];
         $this->view->servicio = [];
         $this->view->data = null;
+        $this->view->titleWeb = constant("SYS-SHORT") . " - Casas";
         $this->view->message = "";
         $this->view->messageHeader = "";
         $this->view->url = "";
