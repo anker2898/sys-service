@@ -17,14 +17,14 @@ require 'views/shared/header.php';
                         <div>
                             <h5 class="card-title">Ingresar datos</h5>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Nombre</label>
                                         <input type="text" class="form-control" id="label" name="label" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['LABEL'] . "' readonly" : "" ?>>
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-materno">Tipo de dato</label>
                                         <?php if ($this->data == null) { ?>
@@ -38,7 +38,7 @@ require 'views/shared/header.php';
                                         <?php } ?>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">Valor</label>
                                         <?php if ($this->data != null) { ?>

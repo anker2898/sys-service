@@ -17,26 +17,26 @@ require 'views/shared/header.php';
                         <div>
                             <h5 class="card-title">Ingresar datos del cliente</h5>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Documento del titular</label>
                                         <input type="text" class="form-control" id="documento" name="documento" minlength="8" maxlength="8" required <?php echo ($this->data == null ? "" : "value ='" . $this->data["DOCUMENTO"] . "'") ?>>
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Nombre del titular </label>
                                         <input type="text" class="form-control" id="nombres" name="nombres" maxlength="50" readonly <?php echo ($this->data == null ? "disabled" : "value ='" . $this->data["NOMBRES"] . "'") ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Correo</label>
                                         <input type="text" class="form-control" id="correo" name="correo" maxlength="50" <?php echo ($this->data == null ? "disabled" : "value ='" . $this->data["CORREO"] . "'") ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Tel&eacute;fono</label>
                                         <input type="text" class="form-control" id="telefono" name="telefono" minlength="9" maxlength="9" <?php echo ($this->data == null ? "disabled" : "value ='" . $this->data["NUMERO"] . "'") ?>>
@@ -45,7 +45,7 @@ require 'views/shared/header.php';
                             </div>
                             <h5 class="card-title">Ingresar datos de la casa</h5>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Condominio</label>
                                         <select class="form-select" id="condominio" name="condominio" <?php echo $this->data != null ? "readonly" : "required disabled" ?>>
@@ -56,62 +56,69 @@ require 'views/shared/header.php';
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-3">
+                                <div class="col-sm-3">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Manzana</label>
                                         <input type="text" class="form-control" id="manzana" name="manzana" maxlength="2" required <?php echo $this->data != null ? "value='" . $this->data['MANZANA'] . "' readonly" : "disabled" ?>>
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
-                                <div class="col-3">
+                                <div class="col-sm-3">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Lote</label>
                                         <input type="number" class="form-control" id="lote" name="lote" required <?php echo $this->data != null ? "value='" . $this->data['LOTE'] . "' readonly" : "disabled" ?>>
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="suministro">Suministro</label>
+                                        <input type="number" class="form-control" id="suministro" name="suministro" maxlength="11" minlength="11" required <?php echo $this->data != null ? "value='" . $this->data['SUMINISTRO'] . "' readonly" : "disabled" ?>>
+                                        <p id="message-suministro" style="font-size: 0.8em;"></p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="form-check form-switch">
                                                 <label class="form-check-label" for="flexCheckDefault11">Energía El&eacute;ctrica
                                                 </label>
-                                                <input class="form-check-input" type="checkbox" id="luz" value="1" name="luz" disabled>
+                                                <input class="form-check-input" type="checkbox" id="luz" value="1" name="luz" <?php echo $this->data != null ? ($this->data['LUZ']['STATUS'] == 0 ? "" : "checked") : "disabled" ?>>
                                             </div>
                                             <br>
                                             <div class="row">
-                                                <div class="col-6">
+                                                <div class="col-sm-6">
                                                     <div class="form-group">
                                                         <label class="form-label" for="nombres">Fecha de inicio</label>
-                                                        <input type="date" class="form-control" id="inicio-luz" name="inicio-luz" required <?php echo $this->data != null ? "value='" . $this->data['MANZANA'] . "' readonly" : "disabled" ?>>
+                                                        <input type="date" class="form-control" id="inicio-luz" name="inicio-luz" required <?php echo $this->data != null ? "value='" . $this->data['LUZ']['INICIO'] . "'" : "disabled" ?> <?php echo $this->data != null ? ($this->data['LUZ']['STATUS'] == 0 ? "disabled" : "") : "" ?>>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-sm-6">
                                                     <div class="form-group">
                                                         <label class="form-label" for="nombres">Medici&oacute;n inicial</label>
-                                                        <input type="number" class="form-control" id="medicion" name="medicion" required <?php echo $this->data != null ? "value='" . $this->data['LOTE'] . "' readonly" : "disabled" ?>>
+                                                        <input type="number" class="form-control" step="0.0001" id="medicion" name="medicion" required <?php echo $this->data != null ? "value='" . $this->data['LUZ']['MEDIDA'] . "'" : "disabled" ?> <?php echo $this->data != null ? ($this->data['LUZ']['STATUS'] == 0 ? "disabled" : "") : "" ?>>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class=" col-6">
+                                <div class="col-sm-6">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="form-check form-switch">
                                                 <label class="form-check-label" for="flexCheckDefault11">Agua potable
                                                 </label>
-                                                <input class="form-check-input" type="checkbox" id="agua" value="1" name="agua" disabled>
+                                                <input class="form-check-input" type="checkbox" id="agua" value="1" name="agua" <?php echo $this->data != null ? ($this->data['AGUA']['STATUS'] == 0 ? "" : "checked") : "disabled" ?>>
                                             </div>
                                             <br>
                                             <div class="row">
-                                                <div class="col-6">
+                                                <div class="col-sm-6">
                                                     <div class="form-group">
                                                         <label class="form-label" for="nombres">Fecha de inicio</label>
-                                                        <input type="date" class="form-control" id="inicio-agua" name="inicio-agua" required <?php echo $this->data != null ? "value='" . $this->data['MANZANA'] . "' readonly" : "disabled" ?>>
+                                                        <input type="date" class="form-control" id="inicio-agua" name="inicio-agua" required <?php echo $this->data != null ? "value='" . $this->data['AGUA']['INICIO'] . "' " : "disabled" ?> <?php echo $this->data != null ? ($this->data['AGUA']['STATUS'] == 0 ? "disabled" : "") : "" ?>>
                                                     </div>
                                                 </div>
                                             </div>
@@ -143,6 +150,7 @@ require 'views/shared/header.php';
                         documento: label
                     },
                     success: function(respuesta) {
+                        console.log(respuesta);
                         let response = JSON.parse(respuesta ?? "{document: null}");
                         $("#message").html(response.DOCUMENTO != null ? "El cliente se encuentra registrado." : "Cliente no resgistrado. Regístrelo <a href='<?php echo constant("URL") ?>/client/new'>aquí</a>").css("color", response.DOCUMENTO != null ? "#1aa053" : "#c03221");
                         $("#nombres").val(response.DOCUMENTO != null ? response.NOMBRE + " " + response.PATERNO + " " + response.MATERNO : "");
@@ -158,6 +166,7 @@ require 'views/shared/header.php';
                         $("#save").prop("disabled", response.DOCUMENTO == null);
                         $('#luz').prop('disabled', response.DOCUMENTO == null);
                         $('#agua').prop('disabled', response.DOCUMENTO == null);
+                        $('#suministro').prop('disabled', response.DOCUMENTO == null);
                     }
                 });
             }
@@ -168,6 +177,22 @@ require 'views/shared/header.php';
         });
         $("#agua").change(function() {
             $('#inicio-agua').prop('disabled', !$(this).prop('checked'));
+        });
+        $("#suministro").keyup(function() {
+            if ($(this).val().length == 11) {
+                $.ajax({
+                    url: "<?php echo constant("URL") ?>/shared/getSuministro",
+                    type: "POST",
+                    data: {
+                        suministro: $(this).val(),
+                    },
+                    success: function(respuesta) {
+                        let response = JSON.parse(respuesta);
+                        $("#message").html(response["valido"] ? "El suministro se encuentra registrado." : "Suministro nuevo").css("color", response["valido"] ? "#c03221" : "#1aa053");
+                        $("#save").prop("disabled", response["valido"]);
+                    }
+                });
+            }
         });
     });
 </script>

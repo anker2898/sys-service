@@ -46,4 +46,24 @@ class Shared extends Controller
             </div>";
         }
     }
+
+    public function image($img, $ext = "*")
+    {
+        $directorio_destino = getcwd() . '/assets/data/';
+        $ruta_imagen = $directorio_destino . $img;
+        header('Content-Type: image/' . $ext);
+        readfile($ruta_imagen);
+    }
+
+    public function getSuministro()
+    {
+        $servicios = $this->model->getSuministro($_POST["suministro"]);
+        echo json_encode($servicios);
+    }
+
+    public function getRecibosAll()
+    {
+        $servicios = $this->model->getRecibo($_POST["suministro"], $_POST["servicio"]);
+        echo json_encode($servicios);
+    }
 }

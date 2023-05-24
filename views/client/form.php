@@ -17,44 +17,44 @@ require 'views/shared/header.php';
                         <div>
                             <h5 class="card-title">Ingresar datos</h5>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Nombre</label>
                                         <input type="text" class="form-control" id="email1" name="nombre" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['NOMBRE'] . "'" : "" ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Apellido Paterno</label>
                                         <input type="text" class="form-control" id="email1" name="apPaterno" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['APELLIDO_PAT'] . "'" : "" ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Apellido Materno</label>
                                         <input type="text" class="form-control" id="email1" name="apMaterno" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['APELLIDO_MAT'] . "'" : "" ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Documento</label>
                                         <input type="text" class="form-control" id="document" name="documento" minlength="8" maxlength="8" required <?php echo $this->data != null ? "value='" . $this->data['DOCUMENTO'] . "'" : "" ?>>
                                         <p id="messageDocument"></p>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Correo</label>
                                         <input type="email" class="form-control" id="email1" name="correo" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['EMAIL'] . "'" : "" ?>>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Tel&eacute;fono</label>
                                         <input type="tel" class="form-control" id="email1" name="fono" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['NUMERO'] . "'" : "" ?>>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-sm-4">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Departamento</label>
                                         <select class="form-select" id="departamento" name="departamento" <?php echo $this->data != null ? "readonly" : "required" ?>>
@@ -65,7 +65,7 @@ require 'views/shared/header.php';
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-sm-4">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Procincia</label>
                                         <select class="form-select" id="provincia" name="provincia" <?php echo $this->data != null ? "readonly" : "required" ?>>
@@ -76,7 +76,7 @@ require 'views/shared/header.php';
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-sm-4">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Distrito</label>
                                         <select class="form-select" id="distrito" name="distrito" <?php echo $this->data != null ? "readonly" : "required" ?>>
@@ -87,7 +87,7 @@ require 'views/shared/header.php';
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-12">
+                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">Direcci&oacute;n</label>
                                         <input type="text" class="form-control" id="value" name="direccion" maxlength="50" required <?php echo $this->data != null ? "value='" . $this->data['DIRECCION'] . "'" : "" ?>>

@@ -23,7 +23,7 @@ class App
         $path = 'controller/' . $url[0] . '.php';
 
         if (file_exists($path)) {
-            if (isset($_SESSION['user']) && $url[0] != "login" && $url[0] != "main" && $url[0] != "shared") {
+            if (isset($_SESSION['user']) && $url[0] != "login" && $url[0] != "main" && $url[0] != "shared" && $url[0] != "jobs") {
                 $flagPermission = true;
                 foreach ($_SESSION['user']['PRIVILEGIOS'] as $pathPermission) {
                     $route = str_replace('/', '', $pathPermission['path']);
@@ -45,7 +45,13 @@ class App
             $controller->loadModel($url[0]);
 
             if (isset($url[1])) {
-                $controller->{$url[1]}();
+                if (isset($url[2])) {
+                    $controller->{$url[1]}($url[2]);
+                    if (isset($url[3]))
+                        $controller->{$url[1]}($url[3], $url[2]);
+                } else {
+                    $controller->{$url[1]}();
+                }
             } else {
                 $controller->render();
             }

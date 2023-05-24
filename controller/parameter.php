@@ -36,6 +36,10 @@ class Parameter extends Controller
 
         $this->view->url = "/parameter";
 
+        if (strlen($data["TYPE"]) > 1) {
+            $data["TYPE"] = array_search($data["TYPE"], constant("TYPE-DATA"));
+        }
+
         try {
             $this->model->save($data);
             $this->view->messageHeader = "Operación exitósa";
