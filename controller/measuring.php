@@ -16,7 +16,7 @@ class Measuring extends Controller
 
     public function render()
     {
-        $this->view->condominio = $this->shared->getCondominio();
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
         $this->view->servicio = $this->shared->getServicio();
         $this->view->render('measuring/index');
     }

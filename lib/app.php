@@ -44,16 +44,22 @@ class App
             $controller = new $url[0];
             $controller->loadModel($url[0]);
 
-            if (isset($url[1])) {
-                if (isset($url[2])) {
-                    $controller->{$url[1]}($url[2]);
-                    if (isset($url[3]))
-                        $controller->{$url[1]}($url[3], $url[2]);
+            try {
+                if (isset($url[1])) {
+                    if (isset($url[2])) {
+                        $controller->{$url[1]}($url[2]);
+                        if (isset($url[3]))
+                            $controller->{$url[1]}($url[3], $url[2]);
+                    } else {
+                        $controller->{$url[1]}();
+                    }
                 } else {
-                    $controller->{$url[1]}();
+                    $controller->render();
                 }
-            } else {
-                $controller->render();
+            } catch (Exception) {
+                require_once 'controller/error.php';
+                $controller = new ErrorResource();
+                return false;
             }
         } else {
             require_once 'controller/error.php';

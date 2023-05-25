@@ -35,7 +35,7 @@ class UserModel extends Model {
     }
 
     public function save($data) {
-        $sql = "CALL SP_INS_USER(:P_SDOCUMENT, :P_SNOMBRE, :P_SAPELLIDO_PAT, :P_SAPELLIDO_MAT, :P_SEMAIL, :P_SNUMBER, :P_NSTATUS, :P_SUSER, :P_NPASSWORD_RESET, :P_SDIRECCION, :P_SPASSWORD)";
+        $sql = "CALL SP_INS_USER(:P_SDOCUMENT, :P_SNOMBRE, :P_SAPELLIDO_PAT, :P_SAPELLIDO_MAT, :P_SEMAIL, :P_SNUMBER, :P_NSTATUS, :P_SUSER, :P_NPASSWORD_RESET, :P_SDIRECCION, :P_SPASSWORD, :P_NURBANIZACION, :P_NDEPARTAMENTO, :P_NPROVINCIA, :P_NDISTRITO)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $stm->bindValue(':P_SDOCUMENT', $data["DOCUMENTO"], PDO::PARAM_STR);
         $stm->bindValue(':P_SNOMBRE', $data["NOMBRE"], PDO::PARAM_STR);
@@ -48,6 +48,10 @@ class UserModel extends Model {
         $stm->bindValue(':P_NPASSWORD_RESET', $data["RESET"], PDO::PARAM_INT);
         $stm->bindValue(':P_SDIRECCION', $data["DIRECCION"], PDO::PARAM_STR);
         $stm->bindValue(':P_SPASSWORD', $data["PASSWORD"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NURBANIZACION', $data["CONDOMINIO"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NDEPARTAMENTO', $data["DEPARTAMENTO"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NPROVINCIA', $data["PROVINCIA"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NDISTRITO', $data["DISTRITO"], PDO::PARAM_STR);
         $stm->execute();
     }
 

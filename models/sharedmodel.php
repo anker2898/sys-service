@@ -61,10 +61,11 @@ class SharedModel extends Model
         return $result;
     }
 
-    public function getCondominio()
+    public function getCondominio($nidUser = 0)
     {
-        $sql = "CALL SP_SEL_URBANIZACION()";
+        $sql = "CALL SP_SEL_URBANIZACION(:P_NIDUSER)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_NIDUSER', $nidUser, PDO::PARAM_INT);
         $stm->execute();
         $resultDb = $stm->fetchAll();
         $result = array();

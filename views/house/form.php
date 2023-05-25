@@ -20,7 +20,7 @@ require 'views/shared/header.php';
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Documento del titular</label>
-                                        <input type="text" class="form-control" id="documento" name="documento" minlength="8" maxlength="8" required <?php echo ($this->data == null ? "" : "value ='" . $this->data["DOCUMENTO"] . "'") ?>>
+                                        <input type="text" class="form-control" id="documento" name="documento" minlength="8" maxlength="8" required <?php echo ($this->data == null ? "" : "value ='" . $this->data["DOCUMENTO"] . "' readonly") ?>>
                                         <p id="message" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
@@ -48,7 +48,7 @@ require 'views/shared/header.php';
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Condominio</label>
-                                        <select class="form-select" id="condominio" name="condominio" <?php echo $this->data != null ? "readonly" : "required disabled" ?>>
+                                        <select class="form-select" id="condominio" name="condominio" <?php echo ($this->data == null ? "required disabled" : "required readonly") ?>>
                                             <option value='' disabled selected>Seleccionar condominio</option>
                                             <?php foreach ($this->condominio as $key => $value) { ?>
                                                 <option value="<?php echo $value[0] ?>" <?php echo $this->data == null ? "" : ($this->data["CONDOMINIO"] == $value[0] ? "selected" : "") ?>><?php echo $value[1] ?></option>
@@ -71,7 +71,7 @@ require 'views/shared/header.php';
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="suministro">Suministro</label>
-                                        <input type="number" class="form-control" id="suministro" name="suministro" maxlength="11" minlength="11" required <?php echo $this->data != null ? "value='" . $this->data['SUMINISTRO'] . "' readonly" : "disabled" ?>>
+                                        <input type="text" class="form-control" id="suministro" name="suministro" maxlength="11" minlength="11" required <?php echo $this->data != null ? "value='" . $this->data['SUMINISTRO'] . "' readonly" : "disabled" ?>>
                                         <p id="message-suministro" style="font-size: 0.8em;"></p>
                                     </div>
                                 </div>
@@ -169,13 +169,16 @@ require 'views/shared/header.php';
                 });
             }
         });
+
         $("#luz").change(function() {
             $('#inicio-luz').prop('disabled', !$(this).prop('checked'));
             $('#medicion').prop('disabled', !$(this).prop('checked'));
         });
+
         $("#agua").change(function() {
             $('#inicio-agua').prop('disabled', !$(this).prop('checked'));
         });
+
         $("#suministro").keyup(function() {
             if ($(this).val().length == 11) {
                 $.ajax({

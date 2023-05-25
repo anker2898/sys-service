@@ -6,7 +6,11 @@ class User extends Controller
     public function __construct()
     {
         parent::__construct();
+
+        $this->shared = new SharedModel();
         $this->view->rows = [];
+        $this->view->departamento = [];
+        $this->view->condominio = [];
         $this->view->data = null;
         $this->view->titleWeb = constant("SYS-SHORT") . " - Usuario";
         $this->view->dataRoles = [];
@@ -27,6 +31,8 @@ class User extends Controller
     public function new()
     {
         $this->view->roles = $this->model->getRoles();
+        $this->view->departamento = $this->shared->getDepartamento();
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
         $this->view->render('user/form');
     }
 
@@ -36,6 +42,10 @@ class User extends Controller
         $this->view->data = $this->model->getById($document);
         $this->view->dataRoles = $this->model->getRolesById($document);
         $this->view->roles = $this->model->getRoles();
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
+        $this->view->departamento = $this->shared->getDepartamento();
+        $this->view->provincia = $this->shared->getProvincia($this->view->data["DEPARTAMENTO"]);
+        $this->view->distrito = $this->shared->getDistrito($this->view->data["PROVINCIA"]);
         $this->view->render('user/form');
     }
 
@@ -52,7 +62,11 @@ class User extends Controller
             "STATUS" => isset($_POST["activo"]) ? $_POST["activo"] : 0,
             "RESET" => isset($_POST["reset"]) ? $_POST["reset"] : 0,
             "DIRECCION" => trim($_POST["direccion"]),
-            "PASSWORD" => md5(trim($_POST["documento"]))
+            "PASSWORD" => md5(trim($_POST["documento"])),
+            "CONDOMINIO" => $_POST["condominio"],
+            "DEPARTAMENTO" => $_POST["departamento"],
+            "PROVINCIA" => $_POST["provincia"],
+            "DISTRITO" => $_POST["distrito"]
         );
         $this->view->url = "/user";
 

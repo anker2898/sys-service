@@ -20,7 +20,7 @@ class House extends Controller
 
     public function render()
     {
-        $this->view->rows = $this->model->get();
+        $this->view->rows = $this->model->get($_SESSION["user"]["NIDUSER"]);
         $this->view->render('house/index');
     }
 
@@ -31,7 +31,7 @@ class House extends Controller
 
     public function new()
     {
-        $this->view->condominio = $this->shared->getCondominio();
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
         $this->view->servicio = $this->shared->getServicio();
         $this->view->render('house/form');
     }
@@ -39,7 +39,7 @@ class House extends Controller
     public function edit()
     {
         $this->view->data = $this->model->getById($_GET["id"]);
-        $this->view->condominio = $this->shared->getCondominio();
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
         $this->view->servicio = $this->shared->getServicio();
         $this->view->render('house/form');
     }

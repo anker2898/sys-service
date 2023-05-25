@@ -144,19 +144,23 @@ require 'views/shared/header.php';
 
     // Validacion DOCUMENTO
     $(document).ready(function() {
-        $("#document").change(function() {
-            var document = $(this).val();
-            $.ajax({
-                url: "<?php echo constant("URL") ?>/client/validDocument",
-                type: "POST",
-                data: {
-                    document: document
-                },
-                success: function(respuesta) {
-                    $("#messageDocument").html(respuesta > 0 ? "El documento ya se encuentra registrado" : "Documento nuevo").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
-                    $('#save').prop('disabled', respuesta > 0);
-                }
-            });
+        $("#document").keyup(function() {
+            let document = $(this).val();
+
+            if (document.toString().length == 8) {
+                $.ajax({
+                    url: "<?php echo constant("URL") ?>/client/validDocument",
+                    type: "POST",
+                    data: {
+                        document: document
+                    },
+                    success: function(respuesta) {
+                        $("#messageDocument").html(respuesta > 0 ? "El documento ya se encuentra registrado" : "Documento nuevo").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
+                        $('#save').prop('disabled', respuesta > 0);
+                    }
+                });
+            }
+
         });
     });
 </script>

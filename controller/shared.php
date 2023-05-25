@@ -28,7 +28,7 @@ class Shared extends Controller
 
     public function condominios()
     {
-        $condominios = $this->model->getCondominio();
+        $condominios = $this->model->getCondominio($_SESSION["user"]["NIDUSER"]);
         echo "<option value='' disabled selected>Seleccionar condominio</option>";
         foreach ($condominios as $value) {
             echo "<option value='" . $value[0] . "'>" . $value[1] . "</option>";

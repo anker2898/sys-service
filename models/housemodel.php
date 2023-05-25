@@ -7,10 +7,11 @@ class HouseModel extends Model
         parent::__construct();
     }
 
-    public function get()
+    public function get($nidUser)
     {
-        $sql = "CALL SP_SEL_CASAS()";
+        $sql = "CALL SP_SEL_CASAS(:P_NIDUSER)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stm->bindValue(':P_NIDUSER', $nidUser, PDO::PARAM_INT);
         $stm->execute();
         $resultDb = $stm->fetchAll();
         $result = array();

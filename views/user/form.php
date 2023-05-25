@@ -54,6 +54,39 @@ require 'views/shared/header.php';
                                         <input type="text" class="form-control" id="email1" name="numero" minlength="9" maxlength="9" required <?php echo $this->data != null ? "value='" . $this->data['NUMERO'] . "'" : "" ?>>
                                     </div>
                                 </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nombres">Departamento</label>
+                                        <select class="form-select" id="departamento" name="departamento" required>
+                                            <option value='' disabled selected>Seleccionar departamento</option>
+                                            <?php foreach ($this->departamento as $key => $value) { ?>
+                                                <option value="<?php echo $value[0] ?>" <?php echo $this->data == null ? "" : ($this->data["DEPARTAMENTO"] == $value[0] ? "selected" : "") ?>><?php echo $value[1] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nombres">Procincia</label>
+                                        <select class="form-select" id="provincia" name="provincia" required>
+                                            <option value='' disabled selected>Seleccionar provincia</option>
+                                            <?php foreach ($this->provincia as $key => $value) { ?>
+                                                <option value="<?php echo $value[0] ?>" <?php echo $this->data == null ? "" : ($this->data["PROVINCIA"] == $value[0] ? "selected" : "") ?>><?php echo $value[1] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nombres">Distrito</label>
+                                        <select class="form-select" id="distrito" name="distrito" required>
+                                            <option value='' disabled selected>Seleccionar distrito</option>
+                                            <?php foreach ($this->distrito as $key => $value) { ?>
+                                                <option value="<?php echo $value[0] ?>" <?php echo $this->data == null ? "" : ($this->data["DISTRITO"] == $value[0] ? "selected" : "") ?>><?php echo $value[1] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-sm-8">
                                     <div class="form-group">
                                         <label class="form-label" for="nombres">Direcci&oacute;n</label>
@@ -64,6 +97,19 @@ require 'views/shared/header.php';
                             <hr class="hr-horizontal">
                             <h5 class="card-title">Credenciales y privilegios</h5>
                             <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nombres">Condominio</label>
+                                        <select class="form-select" id="condominio" name="condominio" required>
+                                            <?php if (count($this->condominio) >= 2) { ?>
+                                                <option value='' disabled selected>Seleccionar condominio</option>
+                                            <?php } ?>
+                                            <?php foreach ($this->condominio as $key => $value) { ?>
+                                                <option value="<?php echo $value[0] ?>" <?php echo $this->data == null ? "" : ($this->data["CONDOMINIO"] == $value[0] ? "selected" : "") ?>><?php echo $value[1] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="form-label" for="apellido-paterno">Usuario</label>
@@ -119,9 +165,44 @@ require 'views/shared/header.php';
     </div>
 </div>
 <script>
+    // Refrescar datos de la provincia
+    $(document).ready(function() {
+        $("#departamento").change(function() {
+            var departamento = $(this).val();
+            $.ajax({
+                url: "<?php echo constant("URL") ?>/shared/provincia",
+                type: "POST",
+                data: {
+                    departamento: departamento
+                },
+                success: function(respuesta) {
+                    $("#provincia").html(respuesta);
+                    $("#distrito").val($("#distrito option:first").val());
+                }
+            });
+        });
+    });
+
+    // Refrescar datos del distrito
+    $(document).ready(function() {
+        $("#provincia").change(function() {
+            var provincia = $(this).val();
+            $.ajax({
+                url: "<?php echo constant("URL") ?>/shared/distrito",
+                type: "POST",
+                data: {
+                    provincia: provincia
+                },
+                success: function(respuesta) {
+                    $("#distrito").html(respuesta);
+                }
+            });
+        });
+    });
+
     // Validacion USUARIO
     $(document).ready(function() {
-        $("#user").change(function() {
+        $("#user").keyup(function() {
             var user = $(this).val();
             $.ajax({
                 url: "<?php echo constant("URL") ?>/user/validUser",
@@ -139,19 +220,22 @@ require 'views/shared/header.php';
 
     // Validacion DOCUMENTO
     $(document).ready(function() {
-        $("#document").change(function() {
+        $("#document").keyup(function() {
             var document = $(this).val();
-            $.ajax({
-                url: "<?php echo constant("URL") ?>/user/validDocument",
-                type: "POST",
-                data: {
-                    document: document
-                },
-                success: function(respuesta) {
-                    $("#messageDocument").html(respuesta > 0 ? "El documento ya se encuentra registrado" : "Documento nuevo").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
-                    $('#save').prop('disabled', respuesta > 0);
-                }
-            });
+
+            if (document.toString().length == 8) {
+                $.ajax({
+                    url: "<?php echo constant("URL") ?>/user/validDocument",
+                    type: "POST",
+                    data: {
+                        document: document
+                    },
+                    success: function(respuesta) {
+                        $("#messageDocument").html(respuesta > 0 ? "El documento ya se encuentra registrado" : "Documento nuevo").css("color", respuesta > 0 ? "#c03221" : "#1aa053");
+                        $('#save').prop('disabled', respuesta > 0);
+                    }
+                });
+            }
         });
     });
 </script>
