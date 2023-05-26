@@ -57,7 +57,12 @@ class Shared extends Controller
 
     public function getSuministro()
     {
-        $servicios = $this->model->getSuministro($_POST["suministro"]);
+        $data = array(
+            "NID" => $_POST["suministro"],
+            "CONDOMINIO" => $_POST["condominio"],
+            "NIDUSER" => $_SESSION["user"]["NIDUSER"]
+        );
+        $servicios = $this->model->getSuministro($data);
         echo json_encode($servicios);
     }
 

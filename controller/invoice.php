@@ -7,6 +7,7 @@ class Invoice extends Controller
         parent::__construct();
 
         $this->shared = new SharedModel();
+        $this->view->condominio = [];
         $this->view->titleWeb = constant("SYS-SHORT") . " - Recibos";
         $this->view->title = "Visualizador de recibos";
         $this->view->subtitle = "Se visualiza recibo de acuerdo a hogar, servicio y titular.";
@@ -14,6 +15,7 @@ class Invoice extends Controller
 
     public function render()
     {
+        $this->view->condominio = $this->shared->getCondominio($_SESSION["user"]["NIDUSER"]);
         $this->view->render('invoice/index');
     }
 

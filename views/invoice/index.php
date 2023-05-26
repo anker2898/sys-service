@@ -10,6 +10,20 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        <?php if (count($this->condominio) > 1) { ?>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="form-label" for="condominio">Condominio</label>
+                                    <select class="form-select" id="condominios" name="condominios">
+                                        <?php foreach ($this->condominio as $value) { ?>
+                                            <option value="<?php echo $value[0] ?>"><?php echo $value[1] ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                        <?php } else { ?>
+                            <input type="hidden" id="condominios" name="condominios" value="<?php echo $this->condominio[0][0] ?>">
+                        <?php } ?>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label class="form-label" for="suministro">Suministro</label>
@@ -38,6 +52,9 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
+                                <?php if (count($this->condominio) > 1) { ?>
+                                    <label class="form-label" for="apellido-materno">&nbsp;</label><br>
+                                <?php } ?>
                                 <button type="button" class="btn btn-primary" id="buscar" disabled>
                                     Buscar
                                 </button>
@@ -319,9 +336,12 @@
                     type: "POST",
                     data: {
                         suministro: $(this).val(),
+                        condominio: $("#condominios").val()
                     },
                     success: function(respuesta) {
                         let response = JSON.parse(respuesta);
+                        $("#message").html(response["valido"] ? "" : "No se encontraron recibos.")
+                            .css("color", response["valido"] ? "" : "#c03221");
                         $("#servicio").prop("disabled", !response["valido"]);
                         $("#recibos").prop("disabled", !response["valido"]);
                     }

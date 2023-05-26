@@ -98,9 +98,11 @@ class SharedModel extends Model
 
     public function getSuministro($suministro)
     {
-        $sql = "CALL SP_VAL_SUMINISTRO(:P_NSUMINISTRO)";
+        $sql = "CALL SP_VAL_SUMINISTRO(:P_NSUMINISTRO, :P_NURBANIZACION, :P_NIDUSER)";
         $stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-        $stm->bindValue(':P_NSUMINISTRO', $suministro, PDO::PARAM_STR);
+        $stm->bindValue(':P_NSUMINISTRO', $suministro["NID"], PDO::PARAM_STR);
+        $stm->bindValue(':P_NURBANIZACION', $suministro["CONDOMINIO"], PDO::PARAM_INT);
+        $stm->bindValue(':P_NIDUSER', $suministro["USER"], PDO::PARAM_INT);
         $stm->execute();
         $resultDb = $stm->fetchAll();
         $result = array(
